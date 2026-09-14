@@ -76,7 +76,13 @@ export function verifyChallengeRun({
   assert.deepEqual(state.isolation, pack.manifest.isolation, 'Run isolation does not match the pack');
   if (!state.isolation.branchSafe) {
     const currentGit = readGitMetadata(resolvedRepo);
-    if (state.git.branch !== null && currentGit.branch !== null) {
+    if (state.git.commit !== null) {
+      assert.notEqual(state.git.branch, null,
+        'Recorded branchSafe=false run has a detached Git HEAD');
+      assert.notEqual(currentGit.commit, null,
+        'Current Git metadata is unavailable for a branchSafe=false run');
+      assert.notEqual(currentGit.branch, null,
+        'Current Git HEAD is detached for a branchSafe=false run');
       assert.equal(currentGit.branch, state.git.branch,
         `Run branch changed while branchSafe is false: ${state.git.branch} -> ${currentGit.branch}`);
     }

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import {
@@ -13,7 +13,8 @@ import { verifyPristineTemplate } from '../.hackathon/scripts/lib/ownership.mjs'
 import {
   REPOSITORY_ROOT,
   createTemplateFixture,
-  destroyFixture
+  destroyFixture,
+  run
 } from './helpers/runtime-fixture.mjs';
 
 test('reconciles exactly 515 source paths and two operational overrides', () => {
@@ -74,5 +75,21 @@ test('template ownership lists every non-baseline file and excludes source cache
     assert.equal(result.fileCount, result.baseline.files.length + result.template.files.length);
   } finally {
     destroyFixture(fixture);
+  }
+});
+
+test('creates and quarantines Git fixtures repeatedly without teardown residue', () => {
+  for (let index = 0; index < 3; index += 1) {
+    const fixture = createTemplateFixture();
+    const root = fixture.root;
+    try {
+      const fsmonitor = run('git', ['config', '--local', '--bool', '--get', 'core.fsmonitor'],
+        { cwd: fixture.repo });
+      assert.equal(fsmonitor.status, 0, fsmonitor.stderr);
+      assert.equal(fsmonitor.stdout.trim(), 'false');
+    } finally {
+      destroyFixture(fixture);
+    }
+    assert.ok(!existsSync(root), `Fixture root survived cleanup iteration ${index}`);
   }
 });

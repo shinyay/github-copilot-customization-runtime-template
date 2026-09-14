@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
 import {
   cpSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
-  rmSync,
+  readdirSync,
+  renameSync,
   writeFileSync
 } from 'node:fs';
 import os from 'node:os';
@@ -58,6 +60,10 @@ export function createTemplateFixture({ git = true } = {}) {
       ['init', '--quiet'],
       ['config', 'user.name', 'Runtime Test'],
       ['config', 'user.email', 'runtime-test@example.invalid'],
+      ['config', 'core.fsmonitor', 'false'],
+      ['config', 'gc.auto', '0'],
+      ['config', 'maintenance.auto', 'false'],
+      ['config', 'maintenance.strategy', 'none'],
       ['add', '-A'],
       ['commit', '--quiet', '-m', 'fixture']
     ]) {
@@ -69,14 +75,60 @@ export function createTemplateFixture({ git = true } = {}) {
 }
 
 export function destroyFixture(fixture) {
-  if (fixture?.root && existsSync(fixture.root)) {
-    rmSync(fixture.root, {
-      recursive: true,
-      force: true,
-      maxRetries: 10,
-      retryDelay: 100
-    });
+  if (!fixture?.root || !existsSync(fixture.root)) return;
+
+  const quarantine = path.join(
+    path.dirname(fixture.root),
+    `${path.basename(fixture.root)}-cleanup-${randomUUID()}`
+  );
+  let renamed = false;
+  let renameError;
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    try {
+      renameSync(fixture.root, quarantine);
+      renamed = true;
+      break;
+    } catch (error) {
+      renameError = error;
+      const retryable = ['EACCES', 'EBUSY', 'ENOTEMPTY', 'EPERM'].includes(error?.code);
+      if (!retryable || attempt === 19) break;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100 * (attempt + 1));
+    }
   }
+  assert.ok(renamed, `Fixture quarantine rename failed: ${renameError?.message ?? 'unknown error'}`);
+
+  let cleanupError = '';
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    const cleanup = spawnSync(process.execPath, [
+      '--input-type=module',
+      '--eval',
+      [
+        "import { rm } from 'node:fs/promises';",
+        "await rm(process.env.RUNTIME_FIXTURE_ROOT, {",
+        '  recursive: true,',
+        '  force: true,',
+        '  maxRetries: 10,',
+        '  retryDelay: 100',
+        '});'
+      ].join('\n')
+    ], {
+      encoding: 'utf8',
+      windowsHide: true,
+      env: {
+        ...process.env,
+        RUNTIME_FIXTURE_ROOT: quarantine
+      }
+    });
+    assert.ok(Number.isInteger(cleanup.status),
+      `Fixture cleanup did not start: ${cleanup.error?.message ?? 'unknown error'}`);
+    if (cleanup.status === 0 && !existsSync(quarantine)) return;
+    cleanupError = cleanup.stderr.trim();
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 200 * (attempt + 1));
+  }
+  const residual = existsSync(quarantine)
+    ? readdirSync(quarantine, { recursive: true }).slice(0, 50)
+    : [];
+  assert.fail(`Fixture cleanup failed after bounded retries: ${cleanupError}; residual=${JSON.stringify(residual)}`);
 }
 
 export function copyGenericPack(fixture) {

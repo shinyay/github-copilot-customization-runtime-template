@@ -59,6 +59,8 @@ function validateConditionalPattern(record, knownConditions, label) {
 
 function assertPatternDoesNotTargetManagedOrIgnoredPath(pattern, label) {
   const segments = pattern.split('/');
+  assert.notEqual(segments[0], '*',
+    `${label} must use a literal first segment so managed namespaces cannot be matched: ${pattern}`);
   assert.ok(!['.git', '.runtime', '.tools'].includes(segments[0]),
     `${label} cannot target an ignored repository root: ${pattern}`);
   assert.ok(!segments.includes('target') && !segments.includes('node_modules'),

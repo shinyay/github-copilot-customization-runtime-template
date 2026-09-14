@@ -47,6 +47,10 @@ export function classifySourceOwnership(repositoryPath, context) {
   if (context.appliedPaths.has(repositoryPath)) return 'pack-applied';
   if (repositoryPath === `${context.submissionRoot}/submission.json`
     || repositoryPath.startsWith(`${context.submissionRoot}/artifacts/`)) return 'submission-bundle';
+  if (repositoryPath === '.hackathon'
+    || repositoryPath.startsWith('.hackathon/')
+    || repositoryPath === context.submissionRoot
+    || repositoryPath.startsWith(`${context.submissionRoot}/`)) return 'violation';
   const matches = context.additionPatterns.filter(candidate => candidate.expression.test(repositoryPath));
   if (matches.length > 0) return 'participant-addition';
   return 'violation';

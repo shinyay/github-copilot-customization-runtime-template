@@ -71,7 +71,7 @@ special files, real-path escape, and NFC plus case-insensitive collisions.
 The byte-identical shared schema is
 [`.hackathon/schemas/challenge-pack.schema.json`](../.hackathon/schemas/challenge-pack.schema.json),
 SHA-256
-`d92c88534e4615dce5fbd35b5e41e983d50549929a2bd902b18d04ad16c178a3`.
+`183c55bc0b395d8287430c5a363a39b4229dfd33479ffee00c6b79d611d1391e`.
 
 Key v1 shapes are:
 
@@ -114,6 +114,10 @@ Key v1 shapes are:
 `forbiddenActiveCustomizations` is an unconditional array of additional deny
 patterns. `cleanup` is advisory metadata only; the runtime never reports those
 manual actions as completed.
+
+An `allowedAdditions` pattern must begin with a literal segment. This prevents
+wildcard languages such as `*/participant/*` from reaching the runtime-owned
+`.hackathon/**` or `submission/**` namespaces.
 
 Overlay is deliberately unable to create participant deliverables. Every
 destination stays below `.hackathon/challenge/`, ends in `.template`, and must
@@ -171,7 +175,8 @@ seconds plus `Z`; `--now` and `SOURCE_DATE_EPOCH` support deterministic tests.
 Git commit, branch, and dirty state are recorded when available and are `null`
 for non-Git fixtures. They describe the clean pre-apply repository used as the
 run base; participant changes after apply do not rewrite the recorded
-`git.dirty` value.
+`git.dirty` value. A Git-backed run with `branchSafe: false` requires a named
+branch at apply, verify, and reset; detached HEAD is rejected.
 
 Run and submission records carry `sourceTreeSha256` for upstream provenance and
 `templateTreeSha256` for the two-override runtime bytes.
@@ -201,6 +206,8 @@ during export.
 Export matches current-condition `submissionFiles` only against verified
 participant additions, changed declared baseline mutations, and required
 evidence. Active customization artifacts must be participant additions.
+The bundle must contain the complete eligible source set selected by those
+patterns; removing one matching source and its artifact invalidates the bundle.
 Artifact names are flattened as:
 
 ```text
@@ -210,7 +217,9 @@ artifacts/<sha256-of-source-path>-<basename>.template
 Name collisions fail. The exporter caps file count, per-file bytes, total
 bytes, and path length; denies `.env`, logs, `.git`, `target`, and
 `node_modules`; and redacts recognized credentials and home/profile paths.
-It never scans undeclared workspace files.
+Raw and JSON-escaped Windows profile paths are handled case-insensitively,
+including profile names with spaces. The exporter never scans undeclared
+workspace files.
 
 Verification values are `pass`, `fail`, `blocked`, or `not-observed`.
 Submission output contains only checks computed by that export invocation.

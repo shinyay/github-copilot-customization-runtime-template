@@ -41,7 +41,8 @@ A reset may change condition in place only when both the existing run and
 incoming pack declare `branchSafe: true` and
 `conditionStrategy: "single-workspace"`. A `separate-workspace` or
 `separate-repository` strategy always requires that separate isolation
-boundary.
+boundary. A `branchSafe: false` Git run must remain on its recorded named
+branch; detached HEAD is rejected.
 
 ## Evidence incomplete
 

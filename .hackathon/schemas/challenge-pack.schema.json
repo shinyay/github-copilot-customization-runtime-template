@@ -314,6 +314,10 @@
               "$ref": "#/$defs/repositoryPattern"
             },
             {
+              "type": "string",
+              "pattern": "^(?!\\*)(?!\\.hackathon(?:/|$))(?!submission(?:/|$))[^/]+(?:/.*)?$"
+            },
+            {
               "not": {
                 "type": "string",
                 "pattern": "^(?:\\.hackathon(?:/|$)|submission(?:/|$))"

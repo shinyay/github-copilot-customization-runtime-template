@@ -71,8 +71,8 @@
     {
       "path": ".hackathon/schemas/challenge-pack.schema.json",
       "mode": "100644",
-      "bytes": 9457,
-      "sha256": "d92c88534e4615dce5fbd35b5e41e983d50549929a2bd902b18d04ad16c178a3"
+      "bytes": 9616,
+      "sha256": "183c55bc0b395d8287430c5a363a39b4229dfd33479ffee00c6b79d611d1391e"
     },
     {
       "path": ".hackathon/schemas/run-state.schema.json",
@@ -107,8 +107,8 @@
     {
       "path": ".hackathon/scripts/lib/apply.mjs",
       "mode": "100644",
-      "bytes": 12055,
-      "sha256": "d562b9f996d9b7ad9b60b7a058c68336eff7160cadc28f0f4d53889f3a6c5552"
+      "bytes": 12609,
+      "sha256": "ff97c0c9e7084c0b7cce0e684952c49fb90a2a80a09fc3015e08f6c1e1c2e603"
     },
     {
       "path": ".hackathon/scripts/lib/baseline.mjs",
@@ -143,14 +143,14 @@
     {
       "path": ".hackathon/scripts/lib/ownership.mjs",
       "mode": "100644",
-      "bytes": 4618,
-      "sha256": "5f48897f561459cef7da735d881b78045ce2c655e6ba0705c5d779c13f19485a"
+      "bytes": 4837,
+      "sha256": "215b73988013d8b141baa43444705031b486f3b5e1d31feeed90900130c17a93"
     },
     {
       "path": ".hackathon/scripts/lib/pack.mjs",
       "mode": "100644",
-      "bytes": 16565,
-      "sha256": "3ee447e27e0311bf1f5fd3569ca9cd5ab26ca68c8aed66f19d6706f48e0a8652"
+      "bytes": 16703,
+      "sha256": "4ba44c37f30a2ebe5a1aa6a4d37414cf001914e9f3482123b34094c7889f331c"
     },
     {
       "path": ".hackathon/scripts/lib/run-state.mjs",
@@ -161,8 +161,8 @@
     {
       "path": ".hackathon/scripts/lib/submission-format.mjs",
       "mode": "100644",
-      "bytes": 12632,
-      "sha256": "3ed3ae14d2f8f0b22db42a1b2a6bf831fc941a53fba332bf1a28337336e119df"
+      "bytes": 13201,
+      "sha256": "705b574818a705a16acbe1bfaf61448e0b78fd7049eda4a84498d6ddd1a8fdb9"
     },
     {
       "path": ".hackathon/scripts/lib/submission.mjs",
@@ -179,8 +179,8 @@
     {
       "path": ".hackathon/scripts/lib/verify-run.mjs",
       "mode": "100644",
-      "bytes": 7898,
-      "sha256": "4a42b68038b2912ec7b0ed9d85a03c650e7ebeef84584827b541a117e790b4de"
+      "bytes": 8217,
+      "sha256": "cb4b487df0a1cb32360447a3ba75c44d53094517da8e6496d97e8bddbabe9aed"
     },
     {
       "path": ".hackathon/scripts/verify-baseline.mjs",
@@ -210,7 +210,7 @@
       "path": ".hackathon/supported-contracts.json",
       "mode": "100644",
       "bytes": 1734,
-      "sha256": "e203c36640ffb9558cfb4ff7d238e24eda5c7f00fee7ec3005a07ae8660cbf1a"
+      "sha256": "b4f2d73f4f5c96c06e11f05c932e2dd5f4077f0708c5dfe40a61b825021bb1e3"
     },
     {
       "path": ".hackathon/template-manifest.json",
@@ -220,7 +220,7 @@
       "path": ".hackathon/template.json",
       "mode": "100644",
       "bytes": 964,
-      "sha256": "ba72139e43d3bdd0e7ae91b44bbb8ba38e77529700e63d3e7471856381a115e2"
+      "sha256": "bf54fca5e356f8d0903b16d51de944c1da369b1bb4be4137906b5e707c301d1f"
     },
     {
       "path": "baseline-manifest.json",
@@ -243,14 +243,14 @@
     {
       "path": "docs/runtime-contract.md",
       "mode": "100644",
-      "bytes": 8907,
-      "sha256": "b8a3d3ba8f1b0c175471765f5b44146ceeb6f0dae59d5af2e6ec9de71d3f514a"
+      "bytes": 9510,
+      "sha256": "8a520d42601965625879196dd854c311c168bf7d185243ad938b6bfa42acd617"
     },
     {
       "path": "docs/troubleshooting.md",
       "mode": "100644",
-      "bytes": 2477,
-      "sha256": "a6b7a4e8946c90930e8873ce2b9a927f53938de2963b1da906e8f24bd3b27052"
+      "bytes": 2576,
+      "sha256": "4a696f888572c113e1f460dd5c52b198d972545142577768913aeeead4a599d7"
     },
     {
       "path": "package.json",
@@ -261,26 +261,26 @@
     {
       "path": "tests/apply-pack.test.mjs",
       "mode": "100644",
-      "bytes": 14524,
-      "sha256": "28866aa9ea07da3efd8ffd578b5da4d1d91501ca9affa714ff4a505b40def419"
+      "bytes": 15561,
+      "sha256": "1f3c9ed2e422a740ae55f616a86a71efdc63fe68efa9094bc74546aa022d6afd"
     },
     {
       "path": "tests/baseline.test.mjs",
       "mode": "100644",
-      "bytes": 3506,
-      "sha256": "61006c73cfc36a79e9cbd4b8fe76a75b492a25146cf54b723472bc61993ce493"
+      "bytes": 4135,
+      "sha256": "a7cb8f77da0db16d85f02c8b3431ff9e14643b85e82448260890aedccc9715fc"
     },
     {
       "path": "tests/export-submission.test.mjs",
       "mode": "100644",
-      "bytes": 7475,
-      "sha256": "5687ce7dbfb4899074ff037814cea2c0f6fc0a9314e0e0088c2266f2ede1ede2"
+      "bytes": 11123,
+      "sha256": "24d7f2ff48c4b5c687c02ee332a14fe841980bc52e4195c5ad9ad09bc0dc3069"
     },
     {
       "path": "tests/helpers/runtime-fixture.mjs",
       "mode": "100644",
-      "bytes": 3360,
-      "sha256": "5a13751ebff71a4a5809dc82aafffc5d42f02c6f497765fad1d229e51c1169e7"
+      "bytes": 5336,
+      "sha256": "6912a5d16e4a30d5588c1f4070f3ce6d6de4057fd8c2173830e0917ee1580f29"
     },
     {
       "path": "tests/neutral-state.test.mjs",
@@ -291,8 +291,8 @@
     {
       "path": "tests/verify-run.test.mjs",
       "mode": "100644",
-      "bytes": 11374,
-      "sha256": "3d6941ab4ae7a75907e98994820a2ec2bf95dd776d6cf7bf79b729d9c4220b8e"
+      "bytes": 12938,
+      "sha256": "5ff89744b8efaf0b753042a7125767e0954a3dbff9dd6af38fdf43505aae225c"
     }
   ]
 }

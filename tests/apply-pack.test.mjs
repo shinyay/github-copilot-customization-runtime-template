@@ -17,7 +17,8 @@ import {
   validatePackManifest
 } from '../.hackathon/scripts/lib/pack.mjs';
 import { assertNoPathCollisions, sha256 } from '../.hackathon/scripts/lib/common.mjs';
-import { matchPathPattern, validatePathPattern } from '../.hackathon/scripts/lib/glob.mjs';
+import { compilePathPattern, matchPathPattern, validatePathPattern } from '../.hackathon/scripts/lib/glob.mjs';
+import { classifySourceOwnership } from '../.hackathon/scripts/lib/ownership.mjs';
 import {
   copyGenericPack,
   createTemplateFixture,
@@ -39,8 +40,8 @@ test('vendors the canonical schema and executes every shared glob conformance ca
     '.hackathon', 'fixtures', 'glob-conformance-v1.json'));
   const packHashBytes = readFileSync(path.join(REPOSITORY_ROOT,
     '.hackathon', 'fixtures', 'pack-hash-v1.json'));
-  assert.equal(schemaBytes.length, 9457);
-  assert.equal(sha256(schemaBytes), 'd92c88534e4615dce5fbd35b5e41e983d50549929a2bd902b18d04ad16c178a3');
+  assert.equal(schemaBytes.length, 9616);
+  assert.equal(sha256(schemaBytes), '183c55bc0b395d8287430c5a363a39b4229dfd33479ffee00c6b79d611d1391e');
   assert.equal(fixtureBytes.length, 1410);
   assert.equal(sha256(fixtureBytes), '2a1d6a53e3e63cf6f6346112fe41d1ab8a5cd7f921575ec5e854f9264e88a388');
   assert.equal(packHashBytes.length, 446);
@@ -50,7 +51,9 @@ test('vendors the canonical schema and executes every shared glob conformance ca
   assert.equal(schema.properties.allowedAdditions.items.$ref, '#/$defs/allowedAddition');
   assert.equal(schema.$defs.repositoryPattern.allOf[1].pattern,
     '^(?:(?:[^/*]+|\\*)/)*(?:[^/*]+|\\*|\\*\\*)$');
-  assert.equal(schema.$defs.allowedAddition.properties.pattern.allOf[1].not.pattern,
+  assert.equal(schema.$defs.allowedAddition.properties.pattern.allOf[1].pattern,
+    '^(?!\\*)(?!\\.hackathon(?:/|$))(?!submission(?:/|$))[^/]+(?:/.*)?$');
+  assert.equal(schema.$defs.allowedAddition.properties.pattern.allOf[2].not.pattern,
     '^(?:\\.hackathon(?:/|$)|submission(?:/|$))');
   assert.equal(schema.$defs.evidenceRequirement.properties.path.allOf[1].pattern,
     '^\\.hackathon/evidence/.+');
@@ -90,6 +93,21 @@ test('vendors the canonical schema and executes every shared glob conformance ca
   externalEvidence.evidenceRequirements[0].path = 'evidence/summary.md';
   assert.throws(() => validatePackManifest(externalEvidence),
     /must stay below .hackathon\/evidence/);
+  const wildcardManagedAddition = structuredClone(genericManifest);
+  wildcardManagedAddition.allowedAdditions[0].pattern = '*/participant/*';
+  assert.throws(() => validatePackManifest(wildcardManagedAddition),
+    /must use a literal first segment/);
+  const ownershipContext = {
+    baselinePaths: new Set(),
+    templatePaths: new Set(),
+    runState: '.hackathon/run.json',
+    evidenceRoot: '.hackathon/evidence',
+    submissionRoot: 'submission',
+    appliedPaths: new Set(),
+    additionPatterns: [{ expression: compilePathPattern('*/participant/*') }]
+  };
+  assert.equal(classifySourceOwnership('.hackathon/participant/file.md', ownershipContext), 'violation');
+  assert.equal(classifySourceOwnership('submission/participant/file.md', ownershipContext), 'violation');
 });
 
 test('applies only inert current-condition starters and writes the final success marker', () => {

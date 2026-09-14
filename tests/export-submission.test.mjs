@@ -1,10 +1,14 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { applyChallengePack } from '../.hackathon/scripts/lib/apply.mjs';
 import { sha256 } from '../.hackathon/scripts/lib/common.mjs';
-import { exportSubmission, inertBundlePath } from '../.hackathon/scripts/lib/submission.mjs';
+import {
+  exportSubmission,
+  inertBundlePath,
+  redactSubmissionText
+} from '../.hackathon/scripts/lib/submission.mjs';
 import { verifyChallengeRun } from '../.hackathon/scripts/lib/verify-run.mjs';
 import {
   copyGenericPack,
@@ -98,12 +102,65 @@ test('verify-after-export rejects a tampered submission document', () => {
       packDirectory: pack,
       now: '2026-09-14T00:02:00Z'
     });
+
     const submissionPath = path.join(fixture.repo, 'submission', 'submission.json');
     const submission = readJson(submissionPath);
     submission.artifacts[0].kind = 'evidence';
     writeText(submissionPath, `${JSON.stringify(submission, null, 2)}\n`);
     assert.throws(() => verifyChallengeRun({ repoRoot: fixture.repo, packDirectory: pack }),
       /not eligible for its declared artifact kind/);
+  } finally {
+    destroyFixture(fixture);
+  }
+});
+
+test('verify-after-export requires every eligible source matched by a submission pattern', () => {
+  const fixture = createTemplateFixture();
+  try {
+    const pack = copyGenericPack(fixture);
+    mutatePack(pack, manifest => {
+      manifest.allowedAdditions = [{
+        pattern: '.github/prompts/*',
+        conditions: ['customized']
+      }];
+      manifest.submissionFiles = [{
+        pattern: '.github/prompts/*',
+        conditions: ['customized']
+      }];
+    });
+    applyChallengePack({
+      repoRoot: fixture.repo,
+      packDirectory: pack,
+      teamId: 'team-01',
+      condition: 'customized',
+      runId: 'run-01',
+      now: '2026-09-14T00:00:00Z'
+    });
+    writeText(path.join(fixture.repo, '.github', 'prompts', 'first.prompt.md'), '# First\n');
+    writeText(path.join(fixture.repo, '.github', 'prompts', 'second.prompt.md'), '# Second\n');
+    writeText(path.join(fixture.repo, '.hackathon', 'evidence', 'summary.md'),
+      '# Summary\n\nParticipant authored.\n\n## Validation\n\nStatic checks only.\n');
+    verifyChallengeRun({
+      repoRoot: fixture.repo,
+      packDirectory: pack,
+      requestedStage: 'submitted',
+      now: '2026-09-14T00:01:00Z'
+    });
+    exportSubmission({
+      repoRoot: fixture.repo,
+      packDirectory: pack,
+      now: '2026-09-14T00:02:00Z'
+    });
+
+    const submissionPath = path.join(fixture.repo, 'submission', 'submission.json');
+    const submission = readJson(submissionPath);
+    assert.equal(submission.artifacts.length, 2);
+    const removed = submission.artifacts.pop();
+    rmSync(path.join(fixture.repo, 'submission', ...removed.bundlePath.split('/')));
+    writeText(submissionPath, `${JSON.stringify(submission, null, 2)}\n`);
+
+    assert.throws(() => verifyChallengeRun({ repoRoot: fixture.repo, packDirectory: pack }),
+      /must exactly match the complete eligible source set/);
   } finally {
     destroyFixture(fixture);
   }
@@ -182,6 +239,57 @@ test('hard-fails raw log-like submission paths', () => {
     prepareSubmitted(fixture, pack, activePath, '# Prompt\n');
     assert.throws(() => exportSubmission({ repoRoot: fixture.repo, packDirectory: pack }),
       /never collected/);
+  } finally {
+    destroyFixture(fixture);
+  }
+});
+
+test('redacts raw and JSON-escaped Windows profile paths from MCP submissions', () => {
+  const rawPaths = [
+    String.raw`C:\Users\alice\repo`,
+    String.raw`c:\users\alice\repo`,
+    String.raw`C:\Users\Alice Smith\repo`
+  ].join('\n');
+  const rawRedacted = redactSubmissionText(rawPaths).text;
+  assert.ok(!/alice/i.test(rawRedacted));
+  assert.equal((rawRedacted.match(/%USERPROFILE%/g) ?? []).length, 3);
+
+  const fixture = createTemplateFixture();
+  try {
+    const pack = copyGenericPack(fixture);
+    mutatePack(pack, manifest => {
+      manifest.allowedAdditions = [{
+        pattern: '.vscode/mcp.json',
+        conditions: ['customized']
+      }];
+      manifest.forbiddenActiveCustomizations =
+        manifest.forbiddenActiveCustomizations.filter(pattern => pattern !== '.vscode/mcp.json');
+      manifest.submissionFiles = [{
+        pattern: '.vscode/mcp.json',
+        conditions: ['customized']
+      }];
+    });
+    const sourceText = [
+      '{',
+      '  "escaped": "C:\\\\Users\\\\alice\\\\repo",',
+      '  "lower": "c:\\\\users\\\\alice\\\\repo",',
+      '  "spaced": "C:\\\\Users\\\\Alice Smith\\\\repo"',
+      '}',
+      ''
+    ].join('\n');
+    prepareSubmitted(fixture, pack, '.vscode/mcp.json', sourceText);
+    const result = exportSubmission({
+      repoRoot: fixture.repo,
+      packDirectory: pack,
+      now: '2026-09-14T00:02:00Z'
+    });
+    const bundled = readFileSync(path.join(
+      fixture.repo,
+      'submission',
+      ...result.artifacts[0].bundlePath.split('/')
+    ), 'utf8');
+    assert.ok(!/users|alice/i.test(bundled));
+    assert.equal((bundled.match(/%USERPROFILE%/g) ?? []).length, 3);
   } finally {
     destroyFixture(fixture);
   }

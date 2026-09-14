@@ -52,7 +52,12 @@ const SECRET_PATTERNS = [
   },
   {
     name: 'windows-home',
-    pattern: /\b[A-Za-z]:\\Users\\[^\\/\s"'`]+/g,
+    pattern: /\b[A-Za-z]:\\\\Users\\\\[^\\\r\n"']+?(?=\\\\|["'\r\n]|$)/gi,
+    replacement: '%USERPROFILE%'
+  },
+  {
+    name: 'windows-home',
+    pattern: /\b[A-Za-z]:\\Users\\[^\\\r\n"']+?(?=\\|["'\r\n]|$)/gi,
     replacement: '%USERPROFILE%'
   },
   {
@@ -71,7 +76,7 @@ export function redactSubmissionText(text) {
       count += 1;
       return rule.replacement.replace(/\$(\d+)/g, (_, index) => args[Number(index)] ?? '');
     });
-    if (count > 0) redactions[rule.name] = count;
+    if (count > 0) redactions[rule.name] = (redactions[rule.name] ?? 0) + count;
   }
   return { text: output, redactions };
 }
@@ -83,7 +88,8 @@ export function assertNoSensitiveText(text, source) {
     `GitHub credential remained after redaction: ${source}`);
   assert.doesNotMatch(text, /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/,
     `Cloud credential remained after redaction: ${source}`);
-  assert.doesNotMatch(text, /\b[A-Za-z]:\\Users\\[^\\/\s"'`]+|(?:\/home|\/Users)\/[^/\s"'`]+/,
+  assert.doesNotMatch(text,
+    /\b[A-Za-z]:\\\\Users\\\\[^\\\r\n"']+?(?=\\\\|["'\r\n]|$)|\b[A-Za-z]:\\Users\\[^\\\r\n"']+?(?=\\|["'\r\n]|$)|(?:\/home|\/Users)\/[^/\s"'`]+/i,
     `Home/profile path remained after redaction: ${source}`);
   const assignments = text.matchAll(
     /(?:"|')?(?:api[_-]?key|access[_-]?token|auth[_-]?token|client[_-]?secret|password|secret)(?:"|')?\s*[:=]\s*([^\r\n]*)/gi
@@ -213,14 +219,39 @@ export function verifySubmissionBundle(repoRoot, configuration, state, { rules, 
     readJsonFile(path.join(root, 'submission.json'), 'Submission document'),
     state
   );
-  const ownerByPath = new Map(ownership.map(record => [record.path, record.owner]));
-  const mutationByPath = new Map(rules.allowedMutations.map(record => [record.path, record]));
   const evidencePaths = new Set(rules.evidenceRequirements.map(record => record.path));
   const submissionPatterns = rules.submissionFiles.map(record => ({
     pattern: record.pattern,
     expression: compilePathPattern(record.pattern),
     matches: 0
   }));
+  const eligibleKinds = new Map();
+  for (const record of ownership) {
+    if (record.owner === 'participant-addition') {
+      eligibleKinds.set(record.path, 'participant-addition');
+    }
+  }
+  for (const mutation of rules.allowedMutations) {
+    const baselineRecord = baseline.files.find(record => record.path === mutation.path);
+    assert.ok(baselineRecord, `Submission mutation is not a baseline path: ${mutation.path}`);
+    const sourceBytes = readFileSync(resolveInside(repoRoot, mutation.path, 'Submission mutation source'));
+    const sourceSha256 = sha256(sourceBytes);
+    if (sourceSha256 !== baselineRecord.sha256) {
+      if (mutation.expectedSha256 !== undefined) {
+        assert.equal(sourceSha256, mutation.expectedSha256,
+          `Submission mutation does not match expected post-image: ${mutation.path}`);
+      }
+      eligibleKinds.set(mutation.path, 'baseline-mutation');
+    }
+  }
+  for (const evidencePath of evidencePaths) {
+    eligibleKinds.set(evidencePath, 'evidence');
+  }
+  const expectedSources = [...eligibleKinds.keys()]
+    .filter(source => submissionPatterns.some(selection => selection.expression.test(source)))
+    .sort(comparePosixPaths);
+  assert.deepEqual(document.artifacts.map(artifact => artifact.source), expectedSources,
+    'Submission artifacts must exactly match the complete eligible source set');
   const expected = ['submission.json'];
   for (const artifact of document.artifacts) {
     assertCollectibleSubmissionPath(artifact.source);
@@ -229,23 +260,7 @@ export function verifySubmissionBundle(repoRoot, configuration, state, { rules, 
     assert.equal(sha256(sourceBytes), artifact.sourceSha256,
       `Submission source changed after export: ${artifact.source}`);
 
-    let expectedKind;
-    if (evidencePaths.has(artifact.source)) {
-      expectedKind = 'evidence';
-    } else if (mutationByPath.has(artifact.source)) {
-      const baselineRecord = baseline.files.find(record => record.path === artifact.source);
-      assert.ok(baselineRecord, `Submission mutation is not a baseline path: ${artifact.source}`);
-      assert.notEqual(artifact.sourceSha256, baselineRecord.sha256,
-        `Submission mutation has no changed post-image: ${artifact.source}`);
-      const mutation = mutationByPath.get(artifact.source);
-      if (mutation.expectedSha256 !== undefined) {
-        assert.equal(artifact.sourceSha256, mutation.expectedSha256,
-          `Submission mutation does not match expected post-image: ${artifact.source}`);
-      }
-      expectedKind = 'baseline-mutation';
-    } else if (ownerByPath.get(artifact.source) === 'participant-addition') {
-      expectedKind = 'participant-addition';
-    }
+    const expectedKind = eligibleKinds.get(artifact.source);
     assert.equal(artifact.kind, expectedKind,
       `Submission source is not eligible for its declared artifact kind: ${artifact.source}`);
     if (classifyActiveCustomization(artifact.source)) {

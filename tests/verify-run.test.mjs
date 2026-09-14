@@ -292,10 +292,10 @@ test('pins the Git branch when branchSafe is false', () => {
   try {
     const pack = copyGenericPack(fixture);
     applyCustomized(fixture, pack);
-    const checkout = run('git', ['checkout', '-q', '-b', 'other-branch'], { cwd: fixture.repo });
+    const checkout = run('git', ['checkout', '-q', '--detach'], { cwd: fixture.repo });
     assert.equal(checkout.status, 0, checkout.stderr);
     assert.throws(() => verifyChallengeRun({ repoRoot: fixture.repo, packDirectory: pack }),
-      /Run branch changed while branchSafe is false/);
+      /Current Git HEAD is detached/);
     assert.throws(() => applyChallengePack({
       repoRoot: fixture.repo,
       packDirectory: pack,
@@ -304,7 +304,52 @@ test('pins the Git branch when branchSafe is false', () => {
       runId: 'replacement-run',
       reset: true,
       now: '2026-09-14T00:01:00Z'
-    }), /Run branch changed while branchSafe is false/);
+    }), /Current Git HEAD is detached/);
+  } finally {
+    destroyFixture(fixture);
+  }
+});
+
+test('rejects branchSafe=false apply from detached HEAD', () => {
+  const fixture = createTemplateFixture();
+  try {
+    const pack = copyGenericPack(fixture);
+    const checkout = run('git', ['checkout', '-q', '--detach'], { cwd: fixture.repo });
+    assert.equal(checkout.status, 0, checkout.stderr);
+    assert.throws(() => applyChallengePack({
+      repoRoot: fixture.repo,
+      packDirectory: pack,
+      teamId: 'team-01',
+      condition: 'baseline',
+      runId: 'detached-run',
+      now: '2026-09-14T00:00:00Z'
+    }), /requires a named Git branch/);
+    assert.ok(!existsSync(path.join(fixture.repo, '.hackathon', 'run.json')));
+  } finally {
+    destroyFixture(fixture);
+  }
+});
+
+test('rejects a recorded detached run after returning to a named branch', () => {
+  const fixture = createTemplateFixture();
+  try {
+    const pack = copyGenericPack(fixture);
+    applyCustomized(fixture, pack);
+    const runStatePath = path.join(fixture.repo, '.hackathon', 'run.json');
+    const state = readJson(runStatePath);
+    state.git.branch = null;
+    writeJson(runStatePath, state);
+    assert.throws(() => verifyChallengeRun({ repoRoot: fixture.repo, packDirectory: pack }),
+      /Recorded branchSafe=false run has a detached Git HEAD/);
+    assert.throws(() => applyChallengePack({
+      repoRoot: fixture.repo,
+      packDirectory: pack,
+      teamId: 'team-01',
+      condition: 'customized',
+      runId: 'replacement-run',
+      reset: true,
+      now: '2026-09-14T00:01:00Z'
+    }), /Recorded branchSafe=false run has a detached Git HEAD/);
   } finally {
     destroyFixture(fixture);
   }

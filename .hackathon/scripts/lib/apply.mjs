@@ -100,7 +100,13 @@ function resetExistingRun({ repoRoot, configuration, pack, condition }) {
   assert.equal(state.stage, 'applied', 'Safe reset is allowed only before a run enters in-progress');
   if (!state.isolation.branchSafe) {
     const currentGit = readGitMetadata(repoRoot);
-    if (state.git.branch !== null && currentGit.branch !== null) {
+    if (state.git.commit !== null) {
+      assert.notEqual(state.git.branch, null,
+        'Recorded branchSafe=false run has a detached Git HEAD and cannot be reset');
+      assert.notEqual(currentGit.commit, null,
+        'Current Git metadata is unavailable for a branchSafe=false reset');
+      assert.notEqual(currentGit.branch, null,
+        'Current Git HEAD is detached for a branchSafe=false reset');
       assert.equal(currentGit.branch, state.git.branch,
         `Run branch changed while branchSafe is false: ${state.git.branch} -> ${currentGit.branch}`);
     }
@@ -206,6 +212,10 @@ export function applyChallengePack({
   const validatedRules = validatePackForTemplate(resolvedRepo, pack, condition);
   verifyPristineTemplate(resolvedRepo);
   const git = assertGitCleanWhenAvailable(resolvedRepo);
+  if (!pack.manifest.isolation.branchSafe && git.commit !== null) {
+    assert.notEqual(git.branch, null,
+      'Applying a branchSafe=false Pack requires a named Git branch; detached HEAD is not allowed');
+  }
 
   const selectedOverlay = pack.overlay
     .filter(entry => entry.conditions.includes(condition))

@@ -11,7 +11,7 @@
   },
   "challengePackSchema": {
     "path": ".hackathon/schemas/challenge-pack.schema.json",
-    "sha256": "d92c88534e4615dce5fbd35b5e41e983d50549929a2bd902b18d04ad16c178a3"
+    "sha256": "183c55bc0b395d8287430c5a363a39b4229dfd33479ffee00c6b79d611d1391e"
   },
   "runStateSchema": {
     "path": ".hackathon/schemas/run-state.schema.json",
