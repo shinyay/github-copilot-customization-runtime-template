@@ -62,7 +62,7 @@
     "allowedAdditions": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/conditionalPattern"
+        "$ref": "#/$defs/allowedAddition"
       }
     },
     "forbiddenActiveCustomizations": {
@@ -99,25 +99,30 @@
       "maxLength": 320,
       "allOf": [
         {
+          "type": "string",
           "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*//).+$"
         },
         {
           "not": {
+            "type": "string",
             "pattern": "(^|/)(?:\\.|\\.\\.)(?:/|$)"
           }
         },
         {
           "not": {
+            "type": "string",
             "pattern": "[\\u0000:*?\"<>|]"
           }
         },
         {
           "not": {
+            "type": "string",
             "pattern": "(^|/)(?:con|prn|aux|nul|com[0-9]|lpt[0-9])(?:\\.|/|$)"
           }
         },
         {
           "not": {
+            "type": "string",
             "pattern": "[. ](?:/|$)"
           }
         }
@@ -129,26 +134,23 @@
       "maxLength": 320,
       "allOf": [
         {
+          "type": "string",
           "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*//).+$"
         },
         {
+          "type": "string",
+          "pattern": "^(?:(?:[^/*]+|\\*)/)*(?:[^/*]+|\\*|\\*\\*)$"
+        },
+        {
           "not": {
+            "type": "string",
             "pattern": "(^|/)(?:\\.|\\.\\.)(?:/|$)"
           }
         },
         {
           "not": {
+            "type": "string",
             "pattern": "[\\u0000:?\"<>|]"
-          }
-        },
-        {
-          "not": {
-            "pattern": "\\*\\*.+"
-          }
-        },
-        {
-          "not": {
-            "pattern": "(^|/)\\*[^/]+"
           }
         }
       ]
@@ -213,6 +215,7 @@
               "$ref": "#/$defs/repositoryPath"
             },
             {
+              "type": "string",
               "pattern": "^payload/.+\\.template$"
             }
           ]
@@ -223,6 +226,7 @@
               "$ref": "#/$defs/repositoryPath"
             },
             {
+              "type": "string",
               "pattern": "^\\.hackathon/challenge/.+\\.template$"
             }
           ]
@@ -255,6 +259,7 @@
             },
             {
               "not": {
+                "type": "string",
                 "pattern": "[*]"
               }
             }
@@ -295,6 +300,37 @@
         }
       }
     },
+    "allowedAddition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pattern",
+        "conditions"
+      ],
+      "properties": {
+        "pattern": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/repositoryPattern"
+            },
+            {
+              "not": {
+                "type": "string",
+                "pattern": "^(?:\\.hackathon(?:/|$)|submission(?:/|$))"
+              }
+            }
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        }
+      }
+    },
     "evidenceRequirement": {
       "type": "object",
       "additionalProperties": false,
@@ -306,7 +342,15 @@
       ],
       "properties": {
         "path": {
-          "$ref": "#/$defs/repositoryPath"
+          "allOf": [
+            {
+              "$ref": "#/$defs/repositoryPath"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\.hackathon/evidence/.+"
+            }
+          ]
         },
         "conditions": {
           "type": "array",

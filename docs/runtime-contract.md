@@ -71,7 +71,7 @@ special files, real-path escape, and NFC plus case-insensitive collisions.
 The byte-identical shared schema is
 [`.hackathon/schemas/challenge-pack.schema.json`](../.hackathon/schemas/challenge-pack.schema.json),
 SHA-256
-`d9f963a809d814272c52b0fa986109540f91b3e49130925275f537eb34021a38`.
+`d92c88534e4615dce5fbd35b5e41e983d50549929a2bd902b18d04ad16c178a3`.
 
 Key v1 shapes are:
 

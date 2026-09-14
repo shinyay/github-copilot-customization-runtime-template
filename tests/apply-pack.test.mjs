@@ -10,7 +10,12 @@ import {
 import path from 'node:path';
 import test from 'node:test';
 import { applyChallengePack } from '../.hackathon/scripts/lib/apply.mjs';
-import { calculatePackSha256, buildPack, loadChallengePack } from '../.hackathon/scripts/lib/pack.mjs';
+import {
+  calculatePackSha256,
+  buildPack,
+  loadChallengePack,
+  validatePackManifest
+} from '../.hackathon/scripts/lib/pack.mjs';
 import { assertNoPathCollisions, sha256 } from '../.hackathon/scripts/lib/common.mjs';
 import { matchPathPattern, validatePathPattern } from '../.hackathon/scripts/lib/glob.mjs';
 import {
@@ -34,13 +39,21 @@ test('vendors the canonical schema and executes every shared glob conformance ca
     '.hackathon', 'fixtures', 'glob-conformance-v1.json'));
   const packHashBytes = readFileSync(path.join(REPOSITORY_ROOT,
     '.hackathon', 'fixtures', 'pack-hash-v1.json'));
-  assert.equal(schemaBytes.length, 8265);
-  assert.equal(sha256(schemaBytes), 'd9f963a809d814272c52b0fa986109540f91b3e49130925275f537eb34021a38');
+  assert.equal(schemaBytes.length, 9457);
+  assert.equal(sha256(schemaBytes), 'd92c88534e4615dce5fbd35b5e41e983d50549929a2bd902b18d04ad16c178a3');
   assert.equal(fixtureBytes.length, 1410);
   assert.equal(sha256(fixtureBytes), '2a1d6a53e3e63cf6f6346112fe41d1ab8a5cd7f921575ec5e854f9264e88a388');
   assert.equal(packHashBytes.length, 446);
   assert.equal(sha256(packHashBytes), '108c4dfe54d97caa3d789f31505c131813195fd0a8dfc6d07c72c24190ee47bd');
   const fixture = JSON.parse(fixtureBytes.toString('utf8'));
+  const schema = JSON.parse(schemaBytes.toString('utf8'));
+  assert.equal(schema.properties.allowedAdditions.items.$ref, '#/$defs/allowedAddition');
+  assert.equal(schema.$defs.repositoryPattern.allOf[1].pattern,
+    '^(?:(?:[^/*]+|\\*)/)*(?:[^/*]+|\\*|\\*\\*)$');
+  assert.equal(schema.$defs.allowedAddition.properties.pattern.allOf[1].not.pattern,
+    '^(?:\\.hackathon(?:/|$)|submission(?:/|$))');
+  assert.equal(schema.$defs.evidenceRequirement.properties.path.allOf[1].pattern,
+    '^\\.hackathon/evidence/.+');
   for (const record of fixture.cases) {
     assert.equal(matchPathPattern(record.pattern, record.path), record.matches,
       `${record.pattern} against ${record.path}`);
@@ -61,6 +74,22 @@ test('vendors the canonical schema and executes every shared glob conformance ca
     ['payload/\u00e9.template', 'payload/e\u0301.template'],
     'Pack paths'
   ), /NFC\/case-insensitive collision/);
+
+  const genericManifest = JSON.parse(readFileSync(path.join(REPOSITORY_ROOT,
+    '.hackathon', 'fixtures', 'generic-pack', 'manifest.json'), 'utf8'));
+  assert.doesNotThrow(() => validatePackManifest(genericManifest));
+  const managedAddition = structuredClone(genericManifest);
+  managedAddition.allowedAdditions[0].pattern = '.hackathon/evidence/*';
+  assert.throws(() => validatePackManifest(managedAddition),
+    /cannot target runtime-owned .hackathon paths/);
+  const submissionAddition = structuredClone(genericManifest);
+  submissionAddition.allowedAdditions[0].pattern = 'submission/*';
+  assert.throws(() => validatePackManifest(submissionAddition),
+    /cannot target the submission bundle/);
+  const externalEvidence = structuredClone(genericManifest);
+  externalEvidence.evidenceRequirements[0].path = 'evidence/summary.md';
+  assert.throws(() => validatePackManifest(externalEvidence),
+    /must stay below .hackathon\/evidence/);
 });
 
 test('applies only inert current-condition starters and writes the final success marker', () => {

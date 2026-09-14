@@ -71,8 +71,8 @@
     {
       "path": ".hackathon/schemas/challenge-pack.schema.json",
       "mode": "100644",
-      "bytes": 8265,
-      "sha256": "d9f963a809d814272c52b0fa986109540f91b3e49130925275f537eb34021a38"
+      "bytes": 9457,
+      "sha256": "d92c88534e4615dce5fbd35b5e41e983d50549929a2bd902b18d04ad16c178a3"
     },
     {
       "path": ".hackathon/schemas/run-state.schema.json",
@@ -210,7 +210,7 @@
       "path": ".hackathon/supported-contracts.json",
       "mode": "100644",
       "bytes": 1734,
-      "sha256": "149cc9084b127c41b7a3c4f4e8bf12e18e12829b21b2e1a8475b62ca3112f583"
+      "sha256": "e203c36640ffb9558cfb4ff7d238e24eda5c7f00fee7ec3005a07ae8660cbf1a"
     },
     {
       "path": ".hackathon/template-manifest.json",
@@ -220,7 +220,7 @@
       "path": ".hackathon/template.json",
       "mode": "100644",
       "bytes": 964,
-      "sha256": "3bf7f9e6f4aef7910f77f325a4e39ec5656eff319df25754a150b5372842d71c"
+      "sha256": "ba72139e43d3bdd0e7ae91b44bbb8ba38e77529700e63d3e7471856381a115e2"
     },
     {
       "path": "baseline-manifest.json",
@@ -244,7 +244,7 @@
       "path": "docs/runtime-contract.md",
       "mode": "100644",
       "bytes": 8907,
-      "sha256": "22ffdabd4bfad43f3b06d9c9471c68757d1c0dda1532a685715f9df2cd2503c9"
+      "sha256": "b8a3d3ba8f1b0c175471765f5b44146ceeb6f0dae59d5af2e6ec9de71d3f514a"
     },
     {
       "path": "docs/troubleshooting.md",
@@ -255,14 +255,14 @@
     {
       "path": "package.json",
       "mode": "100644",
-      "bytes": 851,
-      "sha256": "504eead7303476da42b8e4719c3ed3016a5e224ba70389f8f380f511fcdb29c6"
+      "bytes": 872,
+      "sha256": "d113291e33cdfcda63d3b334588c2c98496a06c1e325b1eb39f4888485e84ead"
     },
     {
       "path": "tests/apply-pack.test.mjs",
       "mode": "100644",
-      "bytes": 13031,
-      "sha256": "dae8139d3e5c1d5c44f261ed54d35c36b18aa9d5ae26172e733ec4e6cdb14a76"
+      "bytes": 14524,
+      "sha256": "28866aa9ea07da3efd8ffd578b5da4d1d91501ca9affa714ff4a505b40def419"
     },
     {
       "path": "tests/baseline.test.mjs",
@@ -279,8 +279,8 @@
     {
       "path": "tests/helpers/runtime-fixture.mjs",
       "mode": "100644",
-      "bytes": 3299,
-      "sha256": "8b23370249b48658ac0e825b71e6bccf3337053046c4b6459edfcbccddc71f5f"
+      "bytes": 3360,
+      "sha256": "5a13751ebff71a4a5809dc82aafffc5d42f02c6f497765fad1d229e51c1169e7"
     },
     {
       "path": "tests/neutral-state.test.mjs",

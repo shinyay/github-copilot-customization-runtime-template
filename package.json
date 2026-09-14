@@ -8,7 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test tests/baseline.test.mjs tests/neutral-state.test.mjs tests/apply-pack.test.mjs tests/verify-run.test.mjs tests/export-submission.test.mjs",
+    "test": "node --test --test-concurrency=1 tests/baseline.test.mjs tests/neutral-state.test.mjs tests/apply-pack.test.mjs tests/verify-run.test.mjs tests/export-submission.test.mjs",
     "verify:baseline": "node .hackathon/scripts/verify-baseline.mjs",
     "verify:neutral": "node .hackathon/scripts/verify-neutral-state.mjs",
     "verify:template": "node .hackathon/scripts/verify-template.mjs",

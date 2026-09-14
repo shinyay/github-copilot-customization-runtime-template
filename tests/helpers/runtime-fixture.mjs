@@ -70,7 +70,12 @@ export function createTemplateFixture({ git = true } = {}) {
 
 export function destroyFixture(fixture) {
   if (fixture?.root && existsSync(fixture.root)) {
-    rmSync(fixture.root, { recursive: true, force: true });
+    rmSync(fixture.root, {
+      recursive: true,
+      force: true,
+      maxRetries: 10,
+      retryDelay: 100
+    });
   }
 }
 
