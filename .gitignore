@@ -1,0 +1,12 @@
+target/
+.tools/
+.runtime/
+.env
+.env.local
+*.log
+.idea/
+.vscode/*
+!.vscode/mcp.json
+*.iml
+.DS_Store
+Thumbs.db

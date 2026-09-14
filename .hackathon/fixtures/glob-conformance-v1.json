@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "semantics": {
+    "caseSensitive": true,
+    "star": "matches zero or more characters within one path segment, including a leading dot",
+    "trailingDoubleStar": "a trailing /** matches one or more descendant segments",
+    "unsupported": [
+      "?",
+      "[]",
+      "{}",
+      "!"
+    ]
+  },
+  "cases": [
+    {
+      "pattern": ".github/*",
+      "path": ".github/copilot-instructions.md",
+      "matches": true
+    },
+    {
+      "pattern": ".github/*",
+      "path": ".github/.keep",
+      "matches": true
+    },
+    {
+      "pattern": ".github/*",
+      "path": ".github/skills/example/SKILL.md",
+      "matches": false
+    },
+    {
+      "pattern": ".hackathon/evidence/**",
+      "path": ".hackathon/evidence/.keep",
+      "matches": true
+    },
+    {
+      "pattern": ".hackathon/evidence/**",
+      "path": ".hackathon/evidence/run/output.md",
+      "matches": true
+    },
+    {
+      "pattern": ".hackathon/evidence/**",
+      "path": ".hackathon/evidence",
+      "matches": false
+    },
+    {
+      "pattern": "foo/*",
+      "path": "foo/.bar",
+      "matches": true
+    },
+    {
+      "pattern": "foo/*",
+      "path": "foo/bar/baz",
+      "matches": false
+    },
+    {
+      "pattern": ".github/copilot-instructions.md",
+      "path": ".github/Copilot-Instructions.md",
+      "matches": false
+    }
+  ]
+}

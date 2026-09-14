@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "algorithm": "baseline-tree-v1",
+  "sourceTreeSha256": "c3cd74e0d65b1ae88a29a4392eb42f9d51ba2c671d111796aacc69fd9cc5b111",
+  "templateTreeSha256": "de428054126dc5fbfde6a7d24372d6c7ca8082ecc2a516d948b1575855ec4cf2",
+  "overrides": [
+    {
+      "path": ".github/workflows/verify.yml",
+      "reason": "Keep the source workflow available for manual validation without running the expensive application workflow automatically in every generated repository.",
+      "source": {
+        "mode": "100644",
+        "gitBlob": "55ce3bd037ba29959747dd0d3c55665e41caee44",
+        "bytes": 6353,
+        "sha256": "16cd1f718712027e267a1426cf213a51abeaa108b4e431846ef5fd8b6bb3247f"
+      },
+      "template": {
+        "mode": "100644",
+        "gitBlob": "c8a6b298cd52e266252313c97b0b81006ccc73b2",
+        "bytes": 6329,
+        "sha256": "4310718263f763afec9f19c42eca39a6f06f21ef7caf7f392246f3010feb0056"
+      }
+    },
+    {
+      "path": ".gitignore",
+      "reason": "Allow the declared HC-011 .vscode/mcp.json participant output while continuing to ignore all other .vscode files.",
+      "source": {
+        "mode": "100644",
+        "gitBlob": "09e621c9cf5ef2d19445c40ba241021ee9de221d",
+        "bytes": 90,
+        "sha256": "df44b5782ca60d5c856c947048549e838d8706184349b1f431df3c2549a4d1df"
+      },
+      "template": {
+        "mode": "100644",
+        "gitBlob": "7802493fc63af9e95a07771f5edb479203b834d3",
+        "bytes": 109,
+        "sha256": "d496c60e81091a7879b630092f340f57c585cc48853acff4cae02ec82058539b"
+      }
+    }
+  ]
+}

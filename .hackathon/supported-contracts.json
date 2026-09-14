@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "templateVersion": 1,
+  "acceptedPackSchemaVersions": [
+    1
+  ],
+  "algorithms": {
+    "baselineTree": "baseline-tree-v1",
+    "packHash": "pack-hash-v1",
+    "pathGlob": "path-glob-v1"
+  },
+  "challengePackSchema": {
+    "path": ".hackathon/schemas/challenge-pack.schema.json",
+    "sha256": "d9f963a809d814272c52b0fa986109540f91b3e49130925275f537eb34021a38"
+  },
+  "runStateSchema": {
+    "path": ".hackathon/schemas/run-state.schema.json",
+    "sha256": "316e0f5449acaffe55636082c2be065ff30f8e4479e28ec0c01058204d6f36c7"
+  },
+  "globConformance": {
+    "path": ".hackathon/fixtures/glob-conformance-v1.json",
+    "sha256": "2a1d6a53e3e63cf6f6346112fe41d1ab8a5cd7f921575ec5e854f9264e88a388"
+  },
+  "packHashConformance": {
+    "path": ".hackathon/fixtures/pack-hash-v1.json",
+    "sha256": "108c4dfe54d97caa3d789f31505c131813195fd0a8dfc6d07c72c24190ee47bd",
+    "expectedPackSha256": "0b5d5efa3b236407194114cf3067b42f4353a321d631bc6c433abde3d0f32a7d"
+  },
+  "genericPack": {
+    "path": ".hackathon/fixtures/generic-pack",
+    "sha256": "4471f88d8d94e253a5ba210b5c7180f83025fae51240e4c9f2446ba5feebff44"
+  },
+  "sourceOwnership": [
+    "baseline-owned",
+    "template-owned",
+    "run-state",
+    "pack-applied",
+    "participant-addition",
+    "submission-bundle",
+    "ignored",
+    "violation"
+  ],
+  "verificationResults": [
+    "pass",
+    "fail",
+    "blocked",
+    "not-observed"
+  ],
+  "limits": {
+    "maxPackFiles": 256,
+    "maxPackBytes": 10485760,
+    "maxOverlayFiles": 128,
+    "maxEvidenceFiles": 32,
+    "maxEvidenceFileBytes": 1048576,
+    "maxSubmissionFiles": 64,
+    "maxSubmissionFileBytes": 1048576,
+    "maxSubmissionTotalBytes": 8388608,
+    "maxRepositoryPathLength": 320
+  }
+}

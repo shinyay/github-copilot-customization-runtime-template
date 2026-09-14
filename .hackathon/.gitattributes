@@ -1,0 +1,3 @@
+/schemas/challenge-pack.schema.json -text -diff
+/fixtures/glob-conformance-v1.json -text -diff
+/fixtures/pack-hash-v1.json -text -diff

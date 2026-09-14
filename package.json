@@ -1,0 +1,18 @@
+{
+  "name": "github-copilot-customization-runtime-template",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Neutral immutable runtime for isolated GitHub Copilot customization challenges",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test tests/baseline.test.mjs tests/neutral-state.test.mjs tests/apply-pack.test.mjs tests/verify-run.test.mjs tests/export-submission.test.mjs",
+    "verify:baseline": "node .hackathon/scripts/verify-baseline.mjs",
+    "verify:neutral": "node .hackathon/scripts/verify-neutral-state.mjs",
+    "verify:template": "node .hackathon/scripts/verify-template.mjs",
+    "build:template-manifest": "node .hackathon/scripts/build-template-manifest.mjs",
+    "verify": "npm run verify:baseline && npm run verify:neutral && npm run verify:template && npm test"
+  }
+}
