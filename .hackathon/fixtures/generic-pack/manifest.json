@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "challengeId": "HC-000",
+  "challengeVersion": 1,
+  "minimumTemplateVersion": 1,
+  "conditions": [
+    "baseline",
+    "customized"
+  ],
+  "isolation": {
+    "tier": "repository",
+    "freshWorkspace": true,
+    "freshConversation": true,
+    "freshProfile": true,
+    "freshRepository": true,
+    "conditionStrategy": "separate-repository",
+    "branchSafe": false
+  },
+  "overlay": [
+    {
+      "source": "payload/copilot-instructions.md.template",
+      "destination": ".hackathon/challenge/copilot-instructions.md.template",
+      "conditions": [
+        "customized"
+      ],
+      "allowOverwrite": false
+    }
+  ],
+  "allowedMutations": [],
+  "allowedAdditions": [
+    {
+      "pattern": ".github/copilot-instructions.md",
+      "conditions": [
+        "customized"
+      ]
+    }
+  ],
+  "forbiddenActiveCustomizations": [
+    ".vscode/mcp.json",
+    ".github/hooks/**",
+    ".github/plugins/**"
+  ],
+  "evidenceRequirements": [
+    {
+      "path": ".hackathon/evidence/summary.md",
+      "conditions": [
+        "customized"
+      ],
+      "stage": "submitted",
+      "requiredHeadings": [
+        "Summary",
+        "Validation"
+      ]
+    }
+  ],
+  "submissionFiles": [
+    {
+      "pattern": ".github/copilot-instructions.md",
+      "conditions": [
+        "customized"
+      ]
+    }
+  ],
+  "cleanup": {
+    "advisory": true,
+    "verifyBaseline": true,
+    "exportSubmission": true,
+    "stopProcesses": true,
+    "archiveRepository": true
+  }
+}

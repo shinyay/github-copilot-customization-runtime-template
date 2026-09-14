@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "templateVersion": 1,
+  "sourceTreeSha256": "c3cd74e0d65b1ae88a29a4392eb42f9d51ba2c671d111796aacc69fd9cc5b111",
+  "templateTreeSha256": "de428054126dc5fbfde6a7d24372d6c7ca8082ecc2a516d948b1575855ec4cf2",
+  "ownership": [
+    "baseline-owned",
+    "template-owned",
+    "run-state",
+    "pack-applied",
+    "participant-addition",
+    "submission-bundle",
+    "ignored",
+    "violation"
+  ],
+  "files": [
+    {
+      "path": ".editorconfig",
+      "mode": "100644",
+      "bytes": 151,
+      "sha256": "fbb87bedc2547f38f12c655e34a4b44f568aa0e5e40d77b14d75bb5a1079a347"
+    },
+    {
+      "path": ".github/workflows/verify-runtime.yml",
+      "mode": "100644",
+      "bytes": 466,
+      "sha256": "a10a8baca05cdae08c67d70309108813b749dc1914c166e48895cf076c9006ac"
+    },
+    {
+      "path": ".hackathon/.gitattributes",
+      "mode": "100644",
+      "bytes": 135,
+      "sha256": "9fbeb3f8dda04b19c3e1875fed473913bb92b2f1c049e4f08c799b56e8e7f26e"
+    },
+    {
+      "path": ".hackathon/README.md",
+      "mode": "100644",
+      "bytes": 1647,
+      "sha256": "2782ea03979116e5300e2a5b6d76ff4dbf6497b2867a815bb4f9b590fd50d627"
+    },
+    {
+      "path": ".hackathon/baseline-overrides.json",
+      "mode": "100644",
+      "bytes": 1563,
+      "sha256": "dea08dec6ff4a8d39c12758729e1ecb85d4dc59092392d3d72ab5f7dd2453f19"
+    },
+    {
+      "path": ".hackathon/fixtures/generic-pack/manifest.json",
+      "mode": "100644",
+      "bytes": 1484,
+      "sha256": "2bc0d27800c0dcc9b803e8bf30fd6140df2f2f000227a104be625258b1e5a31a"
+    },
+    {
+      "path": ".hackathon/fixtures/generic-pack/payload/copilot-instructions.md.template",
+      "mode": "100644",
+      "bytes": 252,
+      "sha256": "9e20c90c2192b5ead11bfcdaf66160fe5f521374646298fb57de46f8aa49163e"
+    },
+    {
+      "path": ".hackathon/fixtures/glob-conformance-v1.json",
+      "mode": "100644",
+      "bytes": 1410,
+      "sha256": "2a1d6a53e3e63cf6f6346112fe41d1ab8a5cd7f921575ec5e854f9264e88a388"
+    },
+    {
+      "path": ".hackathon/fixtures/pack-hash-v1.json",
+      "mode": "100644",
+      "bytes": 446,
+      "sha256": "108c4dfe54d97caa3d789f31505c131813195fd0a8dfc6d07c72c24190ee47bd"
+    },
+    {
+      "path": ".hackathon/schemas/challenge-pack.schema.json",
+      "mode": "100644",
+      "bytes": 9616,
+      "sha256": "183c55bc0b395d8287430c5a363a39b4229dfd33479ffee00c6b79d611d1391e"
+    },
+    {
+      "path": ".hackathon/schemas/run-state.schema.json",
+      "mode": "100644",
+      "bytes": 5400,
+      "sha256": "316e0f5449acaffe55636082c2be065ff30f8e4479e28ec0c01058204d6f36c7"
+    },
+    {
+      "path": ".hackathon/scripts/apply-pack.mjs",
+      "mode": "100644",
+      "bytes": 1590,
+      "sha256": "4be76d1735aa75c5d4d16f6888ff6851faeeb9723063ef1cb7eb85fcd13e2811"
+    },
+    {
+      "path": ".hackathon/scripts/build-pack.mjs",
+      "mode": "100644",
+      "bytes": 965,
+      "sha256": "ffc2863e23dd4226a0c1b2e36890d6970298811078ec414b4daf5fa2e63be116"
+    },
+    {
+      "path": ".hackathon/scripts/build-template-manifest.mjs",
+      "mode": "100644",
+      "bytes": 1099,
+      "sha256": "88e10f510791f38e00a403af36be8b2d8572d414448c6f4ef88c4a199b846237"
+    },
+    {
+      "path": ".hackathon/scripts/export-submission.mjs",
+      "mode": "100644",
+      "bytes": 1202,
+      "sha256": "067bbd5d24cbf826c5fd9b6d80c6662f2a06d977667f1847dbdf654b0f9558db"
+    },
+    {
+      "path": ".hackathon/scripts/lib/apply.mjs",
+      "mode": "100644",
+      "bytes": 12609,
+      "sha256": "ff97c0c9e7084c0b7cce0e684952c49fb90a2a80a09fc3015e08f6c1e1c2e603"
+    },
+    {
+      "path": ".hackathon/scripts/lib/baseline.mjs",
+      "mode": "100644",
+      "bytes": 11084,
+      "sha256": "3299c0106f31e483f3983c95f036c55acebcebd5fb17cdbf3f3cf71c0dec2808"
+    },
+    {
+      "path": ".hackathon/scripts/lib/common.mjs",
+      "mode": "100644",
+      "bytes": 15930,
+      "sha256": "e969b9430f0746ad1b8be7370852cac675d618fb0b04b9d4b1c675fccdb72050"
+    },
+    {
+      "path": ".hackathon/scripts/lib/contracts.mjs",
+      "mode": "100644",
+      "bytes": 3634,
+      "sha256": "892a71d3a4a0ec728595c7643aa32ec4b3643743a71287ce057ab7d6eabc9243"
+    },
+    {
+      "path": ".hackathon/scripts/lib/glob.mjs",
+      "mode": "100644",
+      "bytes": 2280,
+      "sha256": "761a8833f009739ec5d9d776ab675980694637c78c699cefdf3af252badd22a9"
+    },
+    {
+      "path": ".hackathon/scripts/lib/neutral.mjs",
+      "mode": "100644",
+      "bytes": 3527,
+      "sha256": "1b9d11d64b24aa68b9ca92d8b604c3f479dd83e48df29c544fbaf0293cfc5379"
+    },
+    {
+      "path": ".hackathon/scripts/lib/ownership.mjs",
+      "mode": "100644",
+      "bytes": 4837,
+      "sha256": "215b73988013d8b141baa43444705031b486f3b5e1d31feeed90900130c17a93"
+    },
+    {
+      "path": ".hackathon/scripts/lib/pack.mjs",
+      "mode": "100644",
+      "bytes": 16703,
+      "sha256": "4ba44c37f30a2ebe5a1aa6a4d37414cf001914e9f3482123b34094c7889f331c"
+    },
+    {
+      "path": ".hackathon/scripts/lib/run-state.mjs",
+      "mode": "100644",
+      "bytes": 3895,
+      "sha256": "8535f0f2ddc0f9edf4397203830448eb5720cc489b3a29f7b93a9e6f97212b34"
+    },
+    {
+      "path": ".hackathon/scripts/lib/submission-format.mjs",
+      "mode": "100644",
+      "bytes": 13201,
+      "sha256": "705b574818a705a16acbe1bfaf61448e0b78fd7049eda4a84498d6ddd1a8fdb9"
+    },
+    {
+      "path": ".hackathon/scripts/lib/submission.mjs",
+      "mode": "100644",
+      "bytes": 6643,
+      "sha256": "3bc737d21c74cc71c8c5f4c83c83bde6bff4a0b09b2f7e4645d79ab8e3ce50f9"
+    },
+    {
+      "path": ".hackathon/scripts/lib/template-manifest.mjs",
+      "mode": "100644",
+      "bytes": 5393,
+      "sha256": "0a77868e791f3392a0a4c5690118f5b251726e4e69be48a76f1657fe501d77ab"
+    },
+    {
+      "path": ".hackathon/scripts/lib/verify-run.mjs",
+      "mode": "100644",
+      "bytes": 8217,
+      "sha256": "cb4b487df0a1cb32360447a3ba75c44d53094517da8e6496d97e8bddbabe9aed"
+    },
+    {
+      "path": ".hackathon/scripts/verify-baseline.mjs",
+      "mode": "100644",
+      "bytes": 476,
+      "sha256": "cb645437aaef90f37eaf637e7db67e91250a18d9a10a6e9020251948af222fdd"
+    },
+    {
+      "path": ".hackathon/scripts/verify-neutral-state.mjs",
+      "mode": "100644",
+      "bytes": 463,
+      "sha256": "b4736151b90b381863aeb1df9373e381f1058b5b5ab91fe735e9901ba6061f15"
+    },
+    {
+      "path": ".hackathon/scripts/verify-run.mjs",
+      "mode": "100644",
+      "bytes": 1154,
+      "sha256": "96c7d1c324d3b80fc90ea5661b031c6f1a15a990e7643c30f121f6c6eda1c5ca"
+    },
+    {
+      "path": ".hackathon/scripts/verify-template.mjs",
+      "mode": "100644",
+      "bytes": 1092,
+      "sha256": "738becfe2ca3e37ba2a314efa038399ff926067ef2942c6c4148367d8fec94ba"
+    },
+    {
+      "path": ".hackathon/supported-contracts.json",
+      "mode": "100644",
+      "bytes": 1734,
+      "sha256": "b4f2d73f4f5c96c06e11f05c932e2dd5f4077f0708c5dfe40a61b825021bb1e3"
+    },
+    {
+      "path": ".hackathon/template-manifest.json",
+      "integrity": "self"
+    },
+    {
+      "path": ".hackathon/template.json",
+      "mode": "100644",
+      "bytes": 964,
+      "sha256": "bf54fca5e356f8d0903b16d51de944c1da369b1bb4be4137906b5e707c301d1f"
+    },
+    {
+      "path": "baseline-manifest.json",
+      "mode": "100644",
+      "bytes": 149567,
+      "sha256": "9c3dc085891dd37f62705904c319d1ba87ec717fba4be74eae95c9a5acd2269e"
+    },
+    {
+      "path": "docs/github-com-run.md",
+      "mode": "100644",
+      "bytes": 1923,
+      "sha256": "63ca05fc642d22259744be7ce493c08eb623661c5d2a3697fd9212573382cff1"
+    },
+    {
+      "path": "docs/local-run.md",
+      "mode": "100644",
+      "bytes": 2088,
+      "sha256": "da4e7011e8b892caa7dba83bdac9dd4c41b7e95ef2582d312f2db15330b4eef3"
+    },
+    {
+      "path": "docs/runtime-contract.md",
+      "mode": "100644",
+      "bytes": 9510,
+      "sha256": "8a520d42601965625879196dd854c311c168bf7d185243ad938b6bfa42acd617"
+    },
+    {
+      "path": "docs/troubleshooting.md",
+      "mode": "100644",
+      "bytes": 2576,
+      "sha256": "4a696f888572c113e1f460dd5c52b198d972545142577768913aeeead4a599d7"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "bytes": 872,
+      "sha256": "d113291e33cdfcda63d3b334588c2c98496a06c1e325b1eb39f4888485e84ead"
+    },
+    {
+      "path": "tests/apply-pack.test.mjs",
+      "mode": "100644",
+      "bytes": 15561,
+      "sha256": "1f3c9ed2e422a740ae55f616a86a71efdc63fe68efa9094bc74546aa022d6afd"
+    },
+    {
+      "path": "tests/baseline.test.mjs",
+      "mode": "100644",
+      "bytes": 4135,
+      "sha256": "a7cb8f77da0db16d85f02c8b3431ff9e14643b85e82448260890aedccc9715fc"
+    },
+    {
+      "path": "tests/export-submission.test.mjs",
+      "mode": "100644",
+      "bytes": 11123,
+      "sha256": "24d7f2ff48c4b5c687c02ee332a14fe841980bc52e4195c5ad9ad09bc0dc3069"
+    },
+    {
+      "path": "tests/helpers/runtime-fixture.mjs",
+      "mode": "100644",
+      "bytes": 5336,
+      "sha256": "6912a5d16e4a30d5588c1f4070f3ce6d6de4057fd8c2173830e0917ee1580f29"
+    },
+    {
+      "path": "tests/neutral-state.test.mjs",
+      "mode": "100644",
+      "bytes": 2801,
+      "sha256": "5a9674034bc48f0647df04fc317f827f7259944f44559e1b072380bf15cc7f3e"
+    },
+    {
+      "path": "tests/verify-run.test.mjs",
+      "mode": "100644",
+      "bytes": 12938,
+      "sha256": "5ff89744b8efaf0b753042a7125767e0954a3dbff9dd6af38fdf43505aae225c"
+    }
+  ]
+}

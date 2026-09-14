@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "mode": "100644",
+  "files": [
+    {
+      "relativePath": "manifest.json",
+      "contentBase64": "e30K"
+    },
+    {
+      "relativePath": "payload/.hidden.template",
+      "contentBase64": "YWxwaGEK"
+    },
+    {
+      "relativePath": "payload/\u00e9.template",
+      "contentBase64": "56iOCg=="
+    }
+  ],
+  "expectedSha256": "0b5d5efa3b236407194114cf3067b42f4353a321d631bc6c433abde3d0f32a7d"
+}
+

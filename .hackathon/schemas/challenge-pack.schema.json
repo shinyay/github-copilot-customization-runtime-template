@@ -1,0 +1,414 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/shinyay/github-copilot-customization-hackathon/schemas/challenge-pack.schema.json",
+  "title": "GitHub Copilot Customization Hackathon Challenge Pack v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "challengeId",
+    "challengeVersion",
+    "minimumTemplateVersion",
+    "conditions",
+    "isolation",
+    "overlay",
+    "allowedMutations",
+    "allowedAdditions",
+    "forbiddenActiveCustomizations",
+    "evidenceRequirements",
+    "submissionFiles",
+    "cleanup"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "challengeId": {
+      "type": "string",
+      "pattern": "^HC-[0-9]{3}$"
+    },
+    "challengeVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "minimumTemplateVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "conditions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/condition"
+      }
+    },
+    "isolation": {
+      "$ref": "#/$defs/isolation"
+    },
+    "overlay": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/overlay"
+      }
+    },
+    "allowedMutations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/allowedMutation"
+      }
+    },
+    "allowedAdditions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/allowedAddition"
+      }
+    },
+    "forbiddenActiveCustomizations": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/repositoryPattern"
+      }
+    },
+    "evidenceRequirements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidenceRequirement"
+      }
+    },
+    "submissionFiles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/conditionalPattern"
+      }
+    },
+    "cleanup": {
+      "$ref": "#/$defs/cleanup"
+    }
+  },
+  "$defs": {
+    "condition": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,31}$"
+    },
+    "repositoryPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 320,
+      "allOf": [
+        {
+          "type": "string",
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*//).+$"
+        },
+        {
+          "not": {
+            "type": "string",
+            "pattern": "(^|/)(?:\\.|\\.\\.)(?:/|$)"
+          }
+        },
+        {
+          "not": {
+            "type": "string",
+            "pattern": "[\\u0000:*?\"<>|]"
+          }
+        },
+        {
+          "not": {
+            "type": "string",
+            "pattern": "(^|/)(?:con|prn|aux|nul|com[0-9]|lpt[0-9])(?:\\.|/|$)"
+          }
+        },
+        {
+          "not": {
+            "type": "string",
+            "pattern": "[. ](?:/|$)"
+          }
+        }
+      ]
+    },
+    "repositoryPattern": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 320,
+      "allOf": [
+        {
+          "type": "string",
+          "pattern": "^(?!/)(?![A-Za-z]:)(?!.*\\\\)(?!.*//).+$"
+        },
+        {
+          "type": "string",
+          "pattern": "^(?:(?:[^/*]+|\\*)/)*(?:[^/*]+|\\*|\\*\\*)$"
+        },
+        {
+          "not": {
+            "type": "string",
+            "pattern": "(^|/)(?:\\.|\\.\\.)(?:/|$)"
+          }
+        },
+        {
+          "not": {
+            "type": "string",
+            "pattern": "[\\u0000:?\"<>|]"
+          }
+        }
+      ]
+    },
+    "isolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tier",
+        "freshWorkspace",
+        "freshConversation",
+        "freshProfile",
+        "freshRepository",
+        "conditionStrategy",
+        "branchSafe"
+      ],
+      "properties": {
+        "tier": {
+          "enum": [
+            "workspace",
+            "repository",
+            "organization"
+          ]
+        },
+        "freshWorkspace": {
+          "type": "boolean"
+        },
+        "freshConversation": {
+          "type": "boolean"
+        },
+        "freshProfile": {
+          "type": "boolean"
+        },
+        "freshRepository": {
+          "type": "boolean"
+        },
+        "conditionStrategy": {
+          "enum": [
+            "single-workspace",
+            "separate-workspace",
+            "separate-repository"
+          ]
+        },
+        "branchSafe": {
+          "type": "boolean"
+        }
+      }
+    },
+    "overlay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "destination",
+        "conditions",
+        "allowOverwrite"
+      ],
+      "properties": {
+        "source": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/repositoryPath"
+            },
+            {
+              "type": "string",
+              "pattern": "^payload/.+\\.template$"
+            }
+          ]
+        },
+        "destination": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/repositoryPath"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\.hackathon/challenge/.+\\.template$"
+            }
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        },
+        "allowOverwrite": {
+          "const": false
+        }
+      }
+    },
+    "allowedMutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "conditions"
+      ],
+      "properties": {
+        "path": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/repositoryPath"
+            },
+            {
+              "not": {
+                "type": "string",
+                "pattern": "[*]"
+              }
+            }
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        },
+        "expectedSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "conditionalPattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pattern",
+        "conditions"
+      ],
+      "properties": {
+        "pattern": {
+          "$ref": "#/$defs/repositoryPattern"
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        }
+      }
+    },
+    "allowedAddition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pattern",
+        "conditions"
+      ],
+      "properties": {
+        "pattern": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/repositoryPattern"
+            },
+            {
+              "type": "string",
+              "pattern": "^(?!\\*)(?!\\.hackathon(?:/|$))(?!submission(?:/|$))[^/]+(?:/.*)?$"
+            },
+            {
+              "not": {
+                "type": "string",
+                "pattern": "^(?:\\.hackathon(?:/|$)|submission(?:/|$))"
+              }
+            }
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        }
+      }
+    },
+    "evidenceRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "conditions",
+        "stage",
+        "requiredHeadings"
+      ],
+      "properties": {
+        "path": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/repositoryPath"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\.hackathon/evidence/.+"
+            }
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        },
+        "stage": {
+          "const": "submitted"
+        },
+        "requiredHeadings": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "templateSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "cleanup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "advisory",
+        "verifyBaseline",
+        "exportSubmission",
+        "stopProcesses",
+        "archiveRepository"
+      ],
+      "properties": {
+        "advisory": {
+          "const": true
+        },
+        "verifyBaseline": {
+          "type": "boolean"
+        },
+        "exportSubmission": {
+          "type": "boolean"
+        },
+        "stopProcesses": {
+          "type": "boolean"
+        },
+        "archiveRepository": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

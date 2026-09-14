@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "templateVersion": 1,
+  "source": {
+    "repository": "https://github.com/shinyay/code-to-doc-workshop-260910",
+    "commit": "398d7d1982a1402bcdba00d6c3ded67d8d338787",
+    "path": "."
+  },
+  "baselineManifest": "baseline-manifest.json",
+  "baselineOverrides": ".hackathon/baseline-overrides.json",
+  "sourceTreeSha256": "c3cd74e0d65b1ae88a29a4392eb42f9d51ba2c671d111796aacc69fd9cc5b111",
+  "templateTreeSha256": "de428054126dc5fbfde6a7d24372d6c7ca8082ecc2a516d948b1575855ec4cf2",
+  "templateManifest": ".hackathon/template-manifest.json",
+  "challengePackSchema": ".hackathon/schemas/challenge-pack.schema.json",
+  "challengePackSchemaSha256": "183c55bc0b395d8287430c5a363a39b4229dfd33479ffee00c6b79d611d1391e",
+  "supportedContracts": ".hackathon/supported-contracts.json",
+  "runState": ".hackathon/run.json",
+  "evidenceRoot": ".hackathon/evidence",
+  "challengeRoot": ".hackathon/challenge",
+  "submissionDirectory": "submission"
+}

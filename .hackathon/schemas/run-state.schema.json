@@ -1,0 +1,238 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/shinyay/github-copilot-customization-runtime-template/.hackathon/schemas/run-state.schema.json",
+  "title": "Challenge Pack run state v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "stage",
+    "challengeId",
+    "challengeVersion",
+    "runId",
+    "teamId",
+    "condition",
+    "packSha256",
+    "templateVersion",
+    "sourceTreeSha256",
+    "templateTreeSha256",
+    "baselineTreeSha256",
+    "isolation",
+    "appliedFiles",
+    "git",
+    "createdAt",
+    "updatedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "stage": {
+      "enum": [
+        "applied",
+        "in-progress",
+        "submitted"
+      ]
+    },
+    "challengeId": {
+      "type": "string",
+      "pattern": "^HC-[0-9]{3}$"
+    },
+    "challengeVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "runId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "teamId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "condition": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,31}$"
+    },
+    "packSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "templateVersion": {
+      "const": 1
+    },
+    "sourceTreeSha256": {
+      "const": "c3cd74e0d65b1ae88a29a4392eb42f9d51ba2c671d111796aacc69fd9cc5b111"
+    },
+    "templateTreeSha256": {
+      "const": "de428054126dc5fbfde6a7d24372d6c7ca8082ecc2a516d948b1575855ec4cf2"
+    },
+    "baselineTreeSha256": {
+      "const": "de428054126dc5fbfde6a7d24372d6c7ca8082ecc2a516d948b1575855ec4cf2"
+    },
+    "isolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tier",
+        "freshWorkspace",
+        "freshConversation",
+        "freshProfile",
+        "freshRepository",
+        "conditionStrategy",
+        "branchSafe"
+      ],
+      "properties": {
+        "tier": {
+          "enum": [
+            "workspace",
+            "repository",
+            "organization"
+          ]
+        },
+        "freshWorkspace": {
+          "type": "boolean"
+        },
+        "freshConversation": {
+          "type": "boolean"
+        },
+        "freshProfile": {
+          "type": "boolean"
+        },
+        "freshRepository": {
+          "type": "boolean"
+        },
+        "conditionStrategy": {
+          "enum": [
+            "single-workspace",
+            "separate-workspace",
+            "separate-repository"
+          ]
+        },
+        "branchSafe": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "branchSafe": {
+                "const": true
+              }
+            },
+            "required": [
+              "branchSafe"
+            ]
+          },
+          "then": {
+            "properties": {
+              "conditionStrategy": {
+                "const": "single-workspace"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "appliedFiles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "destination",
+          "sha256"
+        ],
+        "properties": {
+          "destination": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 320,
+            "allOf": [
+              {
+                "pattern": "^\\.hackathon/challenge/.+\\.template$"
+              },
+              {
+                "pattern": "^(?!.*\\\\)(?!.*//).+$"
+              },
+              {
+                "not": {
+                  "pattern": "(^|/)(?:\\.|\\.\\.)(?:/|$)"
+                }
+              },
+              {
+                "not": {
+                  "pattern": "[\\u0000:*?\"<>|]"
+                }
+              },
+              {
+                "not": {
+                  "pattern": "(^|/)(?:con|prn|aux|nul|com[0-9]|lpt[0-9])(?:\\.|/|$)"
+                }
+              },
+              {
+                "not": {
+                  "pattern": "[. ](?:/|$)"
+                }
+              }
+            ]
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "git": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commit",
+        "branch",
+        "dirty"
+      ],
+      "properties": {
+        "commit": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{40}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "branch": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dirty": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "updatedAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    }
+  }
+}
