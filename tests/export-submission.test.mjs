@@ -1,9 +1,14 @@
 import assert from 'node:assert/strict';
-import { readFileSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { applyChallengePack } from '../.hackathon/scripts/lib/apply.mjs';
-import { sha256 } from '../.hackathon/scripts/lib/common.mjs';
+import {
+  assertSafeRelativePosixPath,
+  comparePosixPaths,
+  sha256
+} from '../.hackathon/scripts/lib/common.mjs';
+import { assertCollectibleSubmissionPath } from '../.hackathon/scripts/lib/submission-format.mjs';
 import {
   exportSubmission,
   inertBundlePath,
@@ -19,7 +24,7 @@ import {
   writeText
 } from './helpers/runtime-fixture.mjs';
 
-function prepareSubmitted(fixture, pack, activePath = '.github/copilot-instructions.md', activeText = '# Active\n') {
+function prepareSubmittedFiles(fixture, pack, files) {
   applyChallengePack({
     repoRoot: fixture.repo,
     packDirectory: pack,
@@ -28,7 +33,9 @@ function prepareSubmitted(fixture, pack, activePath = '.github/copilot-instructi
     runId: 'run-01',
     now: '2026-09-14T00:00:00Z'
   });
-  writeText(path.join(fixture.repo, ...activePath.split('/')), activeText);
+  for (const file of files) {
+    writeText(path.join(fixture.repo, ...file.source.split('/')), file.text);
+  }
   writeText(path.join(fixture.repo, '.hackathon', 'evidence', 'summary.md'),
     '# Summary\n\nParticipant authored.\n\n## Validation\n\nStatic checks only.\n');
   verifyChallengeRun({
@@ -38,6 +45,32 @@ function prepareSubmitted(fixture, pack, activePath = '.github/copilot-instructi
     now: '2026-09-14T00:01:00Z'
   });
 }
+
+function prepareSubmitted(fixture, pack, activePath = '.github/copilot-instructions.md', activeText = '# Active\n') {
+  prepareSubmittedFiles(fixture, pack, [{ source: activePath, text: activeText }]);
+}
+
+function selectParticipantSubmission(pack, sourcePaths) {
+  mutatePack(pack, manifest => {
+    manifest.allowedAdditions = sourcePaths.map(pattern => ({
+      pattern,
+      conditions: ['customized']
+    }));
+    manifest.submissionFiles = sourcePaths.map(pattern => ({
+      pattern,
+      conditions: ['customized']
+    }));
+  });
+}
+
+const RAW_COLLECTION_PARENT_POLICY_PATHS = [
+  'participant/hc-042/diagnostic/child-policy.md',
+  'diagnostic/archive-policy.md',
+  'participant/hc-042/prompt-log/review-policy.md',
+  'participant/hc-042/DiAgNoStIc/Child-Policy.MD',
+  'participant/hc-042/diagnostic-output/child-policy.md',
+  'participant/hc-042/diagnostic/nested/child-policy.md'
+];
 
 test('exports only declared active files under flattened inert names with redaction', () => {
   const fixture = createTemplateFixture();
@@ -232,15 +265,205 @@ test('hard-fails raw log-like submission paths', () => {
   try {
     const pack = copyGenericPack(fixture);
     const activePath = '.github/prompts/debug.log.prompt.md';
-    mutatePack(pack, manifest => {
-      manifest.allowedAdditions = [{ pattern: activePath, conditions: ['customized'] }];
-      manifest.submissionFiles = [{ pattern: activePath, conditions: ['customized'] }];
-    });
+    selectParticipantSubmission(pack, [activePath]);
     prepareSubmitted(fixture, pack, activePath, '# Prompt\n');
     assert.throws(() => exportSubmission({ repoRoot: fixture.repo, packDirectory: pack }),
       /never collected/);
   } finally {
     destroyFixture(fixture);
+  }
+});
+
+test('exports eligible authored policy documents through redaction and post-export verification', () => {
+  const fixture = createTemplateFixture();
+  try {
+    const pack = copyGenericPack(fixture);
+    const token = `ghp_${'P'.repeat(24)}`;
+    const sourceText = [
+      '# Diagnostic policy',
+      `token=${token}`,
+      'password: synthetic-secret-value',
+      'profile=C:\\Users\\policy-author\\.copilot',
+      ''
+    ].join('\n');
+    const files = [
+      {
+        source: 'participant/hc-042/diagnostic-policy.md',
+        text: sourceText
+      },
+      {
+        source: 'participant/hc-042/route-map.md',
+        text: '# Route map\n'
+      },
+      {
+        source: 'participant/hc-042/decisions.md',
+        text: '# Decisions\n'
+      },
+      {
+        source: 'participant/hc-042/cases/Diagnostic-Policy.MD',
+        text: '# Upper-case diagnostic policy\n'
+      },
+      {
+        source: 'participant/hc-042/cases/PrOmPt-LoG-PoLiCy.mD',
+        text: '# Mixed-case prompt-log policy\n'
+      }
+    ];
+    const sourcePaths = files.map(file => file.source);
+    selectParticipantSubmission(pack, sourcePaths);
+    prepareSubmittedFiles(fixture, pack, files);
+
+    const result = exportSubmission({
+      repoRoot: fixture.repo,
+      packDirectory: pack,
+      now: '2026-09-14T00:02:00Z'
+    });
+
+    assert.deepEqual(
+      result.artifacts.map(artifact => artifact.source),
+      [...sourcePaths].sort(comparePosixPaths)
+    );
+    const policyArtifact = result.artifacts.find(
+      artifact => artifact.source === 'participant/hc-042/diagnostic-policy.md'
+    );
+    assert.ok(policyArtifact);
+    assert.equal(policyArtifact.sourceSha256, sha256(Buffer.from(sourceText, 'utf8')));
+    assert.equal(policyArtifact.bundlePath, inertBundlePath(policyArtifact.source));
+    const bundled = readFileSync(path.join(
+      fixture.repo,
+      'submission',
+      ...policyArtifact.bundlePath.split('/')
+    ), 'utf8');
+    assert.ok(!bundled.includes(token));
+    assert.ok(!bundled.includes('synthetic-secret-value'));
+    assert.ok(!bundled.includes('policy-author'));
+    assert.ok(bundled.includes('[REDACTED]'));
+    assert.ok(bundled.includes('%USERPROFILE%'));
+    assert.equal(
+      readFileSync(path.join(
+        fixture.repo,
+        'participant',
+        'hc-042',
+        'diagnostic-policy.md'
+      ), 'utf8'),
+      sourceText,
+      'redaction must not alter the authored policy source'
+    );
+    assert.equal(
+      verifyChallengeRun({ repoRoot: fixture.repo, packDirectory: pack }).status,
+      'pass'
+    );
+  } finally {
+    destroyFixture(fixture);
+  }
+});
+
+test('rejects raw collection names and directories through the supported export flow', () => {
+  const sourcePaths = [
+    ...RAW_COLLECTION_PARENT_POLICY_PATHS,
+    'participant/hc-042/diagnostic-output.json',
+    'participant/hc-042/diagnostic/packet.json',
+    'diagnostic/packet.json'
+  ];
+  for (const sourcePath of sourcePaths) {
+    const fixture = createTemplateFixture();
+    try {
+      const pack = copyGenericPack(fixture);
+      selectParticipantSubmission(pack, [sourcePath]);
+      prepareSubmitted(fixture, pack, sourcePath, 'SYNTHETIC_TEST_ONLY\n');
+      assert.throws(
+        () => exportSubmission({ repoRoot: fixture.repo, packDirectory: pack }),
+        /never collected/,
+        sourcePath
+      );
+      assert.equal(
+        existsSync(path.join(fixture.repo, 'submission')),
+        false,
+        `rejected export must not publish a submission directory: ${sourcePath}`
+      );
+    } finally {
+      destroyFixture(fixture);
+    }
+  }
+});
+
+test('authored policy classification preserves raw, hard, near-miss, case, and path-safety boundaries', () => {
+  const rawTopics = [
+    'debug',
+    'trace',
+    'diagnostic',
+    'console',
+    'transcript',
+    'chat',
+    'prompt-log'
+  ];
+  const allowedPaths = [
+    'participant/hc-042/diagnostic-policy.md',
+    'participant/hc-042/route-map.md',
+    'participant/hc-042/decisions.md',
+    ...rawTopics.map(topic => `participant/hc-042/${topic}-policy.md`),
+    'participant/hc-042/Diagnostic-Policy.MD',
+    'participant/hc-042/PrOmPt-LoG-PoLiCy.mD'
+  ];
+  for (const sourcePath of allowedPaths) {
+    assert.doesNotThrow(() => {
+      assertSafeRelativePosixPath(sourcePath, 'Submission source');
+      assertCollectibleSubmissionPath(sourcePath);
+    }, sourcePath);
+  }
+
+  const rawPaths = rawTopics.flatMap(topic => [
+    `participant/hc-042/${topic}`,
+    `participant/hc-042/${topic}.json`,
+    `participant/hc-042/${topic}_output.json`,
+    `participant/hc-042/${topic}-output.json`,
+    `participant/hc-042/${topic}/packet.json`
+  ]);
+  const collectiblePathRejects = [
+    ...rawPaths,
+    ...RAW_COLLECTION_PARENT_POLICY_PATHS,
+    '.github/prompts/debug.log.prompt.md',
+    'participant/hc-042/diagnostic.log',
+    'participant/hc-042/trace.dump',
+    'participant/hc-042/session.log',
+    'participant/hc-042/session.DMP',
+    'participant/hc-042/session.dump',
+    'participant/hc-042/prompt-log.json',
+    'participant/hc-042/diagnostic-output.json',
+    'participant/hc-042/diagnostic/packet.json',
+    'diagnostic/packet.json',
+    'participant/hc-042/DIAGNOSTIC-OUTPUT.JSON',
+    'participant/hc-042/PROMPT-LOG.JSON',
+    'participant/hc-042/diagnostic-policy.md.bak',
+    'participant/hc-042/diagnostic-policy.md/child',
+    'participant/hc-042/diagnostic-policy.md-raw',
+    'participant/hc-042/diagnostic-policy.md.log',
+    '.git/diagnostic-policy.md',
+    'target/diagnostic-policy.md',
+    'node_modules/diagnostic-policy.md',
+    '.env/diagnostic-policy.md'
+  ];
+  for (const sourcePath of collectiblePathRejects) {
+    assert.throws(() => {
+      assertSafeRelativePosixPath(sourcePath, 'Submission source');
+      assertCollectibleSubmissionPath(sourcePath);
+    }, /never collected/, sourcePath);
+  }
+
+  const unsafePaths = [
+    'participant/hc-042/diagnostic-policy.md.',
+    'participant/hc-042/diagnostic-policy.md ',
+    'participant\\hc-042\\diagnostic-policy.md',
+    'participant//hc-042/diagnostic-policy.md',
+    '../participant/hc-042/diagnostic-policy.md',
+    '/participant/hc-042/diagnostic-policy.md',
+    'C:/repo/participant/hc-042/diagnostic-policy.md'
+  ];
+  for (const sourcePath of unsafePaths) {
+    assert.throws(
+      () => assertSafeRelativePosixPath(sourcePath, 'Submission source'),
+      undefined,
+      sourcePath
+    );
   }
 });
 

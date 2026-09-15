@@ -17,7 +17,9 @@ import {
 import { compilePathPattern } from './glob.mjs';
 import { classifyActiveCustomization } from './neutral.mjs';
 
-const FORBIDDEN_COLLECTION_PATH = /(?:^|\/)(?:\.git|target|node_modules)(?:\/|$)|(?:^|\/)\.env(?:[./]|$)|(?:^|\/)(?:debug|trace|diagnostic|console|transcript|chat|prompt-log)(?:[._-]|$)|\.(?:log|dmp|dump)$/i;
+const ALWAYS_FORBIDDEN_COLLECTION_PATH = /(?:^|\/)(?:\.git|target|node_modules)(?:\/|$)|(?:^|\/)\.env(?:[./]|$)|\.(?:log|dmp|dump)$/i;
+const RAW_COLLECTION_PATH = /(?:^|\/)(?:debug|trace|diagnostic|console|transcript|chat|prompt-log)(?:[._\/-]|$)/i;
+const AUTHORED_POLICY_DOCUMENT_BASENAME = /^[^/]+-policy\.md$/i;
 
 const SECRET_PATTERNS = [
   {
@@ -106,7 +108,15 @@ export function assertNoSensitiveText(text, source) {
 }
 
 export function assertCollectibleSubmissionPath(source) {
-  assert.ok(!FORBIDDEN_COLLECTION_PATH.test(source),
+  const dirname = path.posix.dirname(source);
+  const basename = path.posix.basename(source);
+  const rawParentDirectory = dirname !== '.' && RAW_COLLECTION_PATH.test(dirname);
+  const rawBasename = RAW_COLLECTION_PATH.test(basename);
+  const collectible = !ALWAYS_FORBIDDEN_COLLECTION_PATH.test(source)
+    && !rawParentDirectory
+    && (!rawBasename
+      || AUTHORED_POLICY_DOCUMENT_BASENAME.test(basename));
+  assert.ok(collectible,
     `Credentials, raw logs, build output, and repository internals are never collected: ${source}`);
 }
 
