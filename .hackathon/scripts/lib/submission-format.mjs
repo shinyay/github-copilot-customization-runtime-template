@@ -17,7 +17,9 @@ import {
 import { compilePathPattern } from './glob.mjs';
 import { classifyActiveCustomization } from './neutral.mjs';
 
-const FORBIDDEN_COLLECTION_PATH = /(?:^|\/)(?:\.git|target|node_modules)(?:\/|$)|(?:^|\/)\.env(?:[./]|$)|(?:^|\/)(?:debug|trace|diagnostic|console|transcript|chat|prompt-log)(?:[._-]|$)|\.(?:log|dmp|dump)$/i;
+const ALWAYS_FORBIDDEN_COLLECTION_PATH = /(?:^|\/)(?:\.git|target|node_modules)(?:\/|$)|(?:^|\/)\.env(?:[./]|$)|\.(?:log|dmp|dump)$/i;
+const RAW_COLLECTION_PATH = /(?:^|\/)(?:debug|trace|diagnostic|console|transcript|chat|prompt-log)(?:[._\/-]|$)/i;
+const AUTHORED_POLICY_DOCUMENT_PATH = /(?:^|\/)[^/]+-policy\.md$/i;
 
 const SECRET_PATTERNS = [
   {
@@ -106,7 +108,10 @@ export function assertNoSensitiveText(text, source) {
 }
 
 export function assertCollectibleSubmissionPath(source) {
-  assert.ok(!FORBIDDEN_COLLECTION_PATH.test(source),
+  const collectible = !ALWAYS_FORBIDDEN_COLLECTION_PATH.test(source)
+    && (!RAW_COLLECTION_PATH.test(source)
+      || AUTHORED_POLICY_DOCUMENT_PATH.test(source));
+  assert.ok(collectible,
     `Credentials, raw logs, build output, and repository internals are never collected: ${source}`);
 }
 

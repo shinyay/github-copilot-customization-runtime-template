@@ -53,9 +53,20 @@ replace any unchanged template content.
 ## Submission refused
 
 Export requires a `submitted` run. It refuses undeclared files, inactive source
-paths, `.env`, logs, repository internals, build/dependency output, binary
-content, size/count limits, and flattened-name collisions. Recognized secrets
-and home/profile paths are redacted in the bundle, never in the working file.
+paths, `.env`, repository internals, build/dependency output, `.log`, `.dmp`,
+and `.dump` files, raw collection names or directories (`debug`, `trace`,
+`diagnostic`, `console`, `transcript`, `chat`, and `prompt-log`), binary
+content, size/count limits, and flattened-name collisions.
+
+An otherwise eligible authored document such as `diagnostic-policy.md` is
+collectible because its basename ends exactly in `-policy.md`
+case-insensitively. Near misses such as `diagnostic-policy.md.bak`,
+`diagnostic-policy.md-raw`, a `diagnostic/` directory, or a policy-like file
+under `.git`, `target`, `node_modules`, or `.env` remain forbidden. This
+authored-policy distinction changes only the raw-topic classification;
+path-safety, containment, exact eligible-set, size, redaction, hashes, and
+post-export verification still apply. Recognized secrets and home/profile
+paths are redacted in the bundle, never in the working file.
 
 ## Scope limitation
 

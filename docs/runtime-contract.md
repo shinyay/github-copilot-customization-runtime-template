@@ -215,9 +215,19 @@ artifacts/<sha256-of-source-path>-<basename>.template
 ```
 
 Name collisions fail. The exporter caps file count, per-file bytes, total
-bytes, and path length; denies `.env`, logs, `.git`, `target`, and
-`node_modules`; and redacts recognized credentials and home/profile paths.
-Raw and JSON-escaped Windows profile paths are handled case-insensitively,
+bytes, and path length. It unconditionally denies `.git`, `target`,
+`node_modules`, `.env`, and files ending in `.log`, `.dmp`, or `.dump`.
+Paths classified as raw `debug`, `trace`, `diagnostic`, `console`,
+`transcript`, `chat`, or `prompt-log` collections are also denied, including
+topic directories. Only that raw-topic check permits an otherwise eligible
+regular UTF-8 file when its basename ends exactly in `-policy.md`
+case-insensitively, so an authored document such as `diagnostic-policy.md` is
+distinct from diagnostic output. The authored-policy rule does not bypass
+path safety, containment, eligibility, size, collision, exact-set, redaction,
+hash, or post-export verification.
+
+Recognized credentials and home/profile paths are redacted in the bundle. Raw
+and JSON-escaped Windows profile paths are handled case-insensitively,
 including profile names with spaces. The exporter never scans undeclared
 workspace files.
 

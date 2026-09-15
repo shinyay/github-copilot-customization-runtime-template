@@ -161,8 +161,8 @@
     {
       "path": ".hackathon/scripts/lib/submission-format.mjs",
       "mode": "100644",
-      "bytes": 13201,
-      "sha256": "705b574818a705a16acbe1bfaf61448e0b78fd7049eda4a84498d6ddd1a8fdb9"
+      "bytes": 13447,
+      "sha256": "386dd160df00c3963f60cef47e18b80cdbdba34dd3e74ead33002dee09bf1e62"
     },
     {
       "path": ".hackathon/scripts/lib/submission.mjs",
@@ -243,14 +243,14 @@
     {
       "path": "docs/runtime-contract.md",
       "mode": "100644",
-      "bytes": 9510,
-      "sha256": "8a520d42601965625879196dd854c311c168bf7d185243ad938b6bfa42acd617"
+      "bytes": 10133,
+      "sha256": "0300a11f362b2e706b8a8ae4b15b616cd1c36fcc691da56efde81dae1f55b6ab"
     },
     {
       "path": "docs/troubleshooting.md",
       "mode": "100644",
-      "bytes": 2576,
-      "sha256": "4a696f888572c113e1f460dd5c52b198d972545142577768913aeeead4a599d7"
+      "bytes": 3265,
+      "sha256": "7daff753ec568c2738b3d7f053ed9e2c2bfa7d91b6565e9f949afe497549920d"
     },
     {
       "path": "package.json",
@@ -273,8 +273,8 @@
     {
       "path": "tests/export-submission.test.mjs",
       "mode": "100644",
-      "bytes": 11123,
-      "sha256": "24d7f2ff48c4b5c687c02ee332a14fe841980bc52e4195c5ad9ad09bc0dc3069"
+      "bytes": 17927,
+      "sha256": "f29eae327c7fb3742df6654508b01ab9151505f5b30566bd9c3ec964635723cb"
     },
     {
       "path": "tests/helpers/runtime-fixture.mjs",
