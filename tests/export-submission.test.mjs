@@ -63,6 +63,15 @@ function selectParticipantSubmission(pack, sourcePaths) {
   });
 }
 
+const RAW_COLLECTION_PARENT_POLICY_PATHS = [
+  'participant/hc-042/diagnostic/child-policy.md',
+  'diagnostic/archive-policy.md',
+  'participant/hc-042/prompt-log/review-policy.md',
+  'participant/hc-042/DiAgNoStIc/Child-Policy.MD',
+  'participant/hc-042/diagnostic-output/child-policy.md',
+  'participant/hc-042/diagnostic/nested/child-policy.md'
+];
+
 test('exports only declared active files under flattened inert names with redaction', () => {
   const fixture = createTemplateFixture();
   try {
@@ -350,6 +359,7 @@ test('exports eligible authored policy documents through redaction and post-expo
 
 test('rejects raw collection names and directories through the supported export flow', () => {
   const sourcePaths = [
+    ...RAW_COLLECTION_PARENT_POLICY_PATHS,
     'participant/hc-042/diagnostic-output.json',
     'participant/hc-042/diagnostic/packet.json',
     'diagnostic/packet.json'
@@ -410,6 +420,7 @@ test('authored policy classification preserves raw, hard, near-miss, case, and p
   ]);
   const collectiblePathRejects = [
     ...rawPaths,
+    ...RAW_COLLECTION_PARENT_POLICY_PATHS,
     '.github/prompts/debug.log.prompt.md',
     'participant/hc-042/diagnostic.log',
     'participant/hc-042/trace.dump',
